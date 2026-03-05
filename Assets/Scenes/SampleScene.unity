@@ -690,8 +690,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player
   speed: 5
   jumpPower: 300
-  slowingValue: 0.3
-  maxSlowingCount: 2
+  maxStamina: 100
+  staminaRecovery: 10
+  slowingFactor: 0.3
+  slowingCost: 50
   playerInterface: {fileID: 2003844221}
 --- !u!50 &931150974
 Rigidbody2D:
@@ -1093,9 +1095,9 @@ RectTransform:
   - {fileID: 1612387537}
   m_Father: {fileID: 2003844217}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -339, y: 193}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 100, y: -25}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1926496584

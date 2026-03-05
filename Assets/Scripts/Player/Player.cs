@@ -7,10 +7,12 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private float speed = 5.0f;
     [SerializeField] private float jumpPower = 300.0f;
-    [SerializeField] private float slowingValue = 0.3f;
-    [SerializeField] private float maxSlowingCount = 2f;
+    [SerializeField] private float maxStamina = 100f;
+    [SerializeField] private float staminaRecovery = 10f;
+    [SerializeField] private float slowingFactor = 0.3f;
+    [SerializeField] private float slowingCost = 50f;
     private float direction = 0;
-    private float slowingCount;
+    private float stamina;
 
     public Interface playerInterface;
     private Rigidbody2D rb;
@@ -24,8 +26,6 @@ public class Player : MonoBehaviour
         
         playerInput = GetComponent<PlayerInput>();
         playerInput.actions["Slowing"].canceled += OnSlowingCanceled;
-
-        playerInterface.SetMinMax(0, maxSlowingCount);
     }
 
     private void OnMove(InputValue value)
@@ -43,7 +43,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionStay2D(Collision2D collision)
     {
         Vector2 normal = collision.contacts[0].normal;
         if (normal.y > 0)
@@ -71,10 +71,10 @@ public class Player : MonoBehaviour
     private bool isSlowing = false;
     private void OnSlowing()
     {
-        if (slowingCount > maxSlowingCount * 0.2f || isSlowing)
+        if (stamina > maxStamina * 0.2f || isSlowing)
         {
             isSlowing = true;
-            Time.timeScale = slowingValue;
+            Time.timeScale = slowingFactor;
         }
     }
 
@@ -90,8 +90,8 @@ public class Player : MonoBehaviour
 
         if (isSlowing)
         {
-            slowingCount -= Time.fixedDeltaTime / Time.timeScale;
-            if (slowingCount <= 0)
+            stamina -= Time.fixedDeltaTime / Time.timeScale * slowingCost;
+            if (stamina <= 0)
             {
                 Time.timeScale = 1f;
                 isSlowing = false;
@@ -99,16 +99,17 @@ public class Player : MonoBehaviour
         }
         else
         {
-            if (slowingCount < maxSlowingCount)
+            if (stamina < maxStamina)
             {
-                slowingCount += Time.fixedDeltaTime;
-                if (slowingCount > maxSlowingCount)
+                stamina += Time.fixedDeltaTime * staminaRecovery;
+                if (stamina > maxStamina)
                 {
-                    slowingCount = maxSlowingCount;
+                    stamina = maxStamina;
                 }
             }
         }
-        playerInterface.SetStamina(slowingCount);
+        playerInterface.staminaS.value =
+            stamina / maxStamina * playerInterface.staminaS.maxValue;
     }
 
 }
