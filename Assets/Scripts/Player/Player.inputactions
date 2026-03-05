@@ -3,7 +3,7 @@
     "name": "Player",
     "maps": [
         {
-            "name": "Moving",
+            "name": "Game",
             "id": "dc24eff4-14b0-4c48-9172-dfa911404e41",
             "actions": [
                 {
@@ -19,6 +19,15 @@
                     "name": "Jump",
                     "type": "Button",
                     "id": "66e72aaf-0236-4e83-954e-efd6fcdff26a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Slowing",
+                    "type": "Button",
+                    "id": "3dfe376c-945d-4faf-8db8-6189bfa9309f",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -67,6 +76,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "27a40d36-3e0a-490b-bb32-5124a2553ccc",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Slowing",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

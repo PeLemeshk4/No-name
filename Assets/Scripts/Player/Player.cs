@@ -1,26 +1,31 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using static UnityEngine.Rendering.DebugUI;
 
 public class Player : MonoBehaviour
 {
     [SerializeField] private float speed = 5.0f;
     [SerializeField] private float jumpPower = 300.0f;
+    [SerializeField] private float slowingValue = 0.3f;
+    [SerializeField] private float maxSlowingCount = 2f;
     private float direction = 0;
+    private float slowingCount;
 
+    public Interface playerInterface;
     private Rigidbody2D rb;
+    private PlayerInput playerInput;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-    }
+        
+        playerInput = GetComponent<PlayerInput>();
+        playerInput.actions["Slowing"].canceled += OnSlowingCanceled;
 
-    private void FixedUpdate()
-    {
-        // ¬цепл€етс€ в стену насмерть, надо что-то делать
-        rb.linearVelocityX = direction * speed;
+        playerInterface.SetMinMax(0, maxSlowingCount);
     }
 
     private void OnMove(InputValue value)
@@ -28,8 +33,82 @@ public class Player : MonoBehaviour
         direction = value.Get<float>();
     }
 
+    private bool onGround = false;
     private void OnJump()
     {
-        rb.AddForceY(jumpPower);
+        if (onGround)
+        {
+            rb.AddForceY(jumpPower);
+            onGround = false;
+        }
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Vector2 normal = collision.contacts[0].normal;
+        if (normal.y > 0)
+        {
+            onGround = true;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.contacts.Length != 0)
+        {
+            Vector2 normal = collision.contacts[0].normal;
+            if (normal.y == 0)
+            {
+                onGround = false;
+            }
+        }
+        else
+        {
+            onGround = false;
+        }
+    }
+
+    private bool isSlowing = false;
+    private void OnSlowing()
+    {
+        if (slowingCount > maxSlowingCount * 0.2f || isSlowing)
+        {
+            isSlowing = true;
+            Time.timeScale = slowingValue;
+        }
+    }
+
+    private void OnSlowingCanceled(InputAction.CallbackContext context)
+    {
+        Time.timeScale = 1f;
+        isSlowing = false;
+    }
+
+    private void FixedUpdate()
+    {
+        rb.linearVelocityX = direction * speed;
+
+        if (isSlowing)
+        {
+            slowingCount -= Time.fixedDeltaTime / Time.timeScale;
+            if (slowingCount <= 0)
+            {
+                Time.timeScale = 1f;
+                isSlowing = false;
+            }
+        }
+        else
+        {
+            if (slowingCount < maxSlowingCount)
+            {
+                slowingCount += Time.fixedDeltaTime;
+                if (slowingCount > maxSlowingCount)
+                {
+                    slowingCount = maxSlowingCount;
+                }
+            }
+        }
+        playerInterface.SetStamina(slowingCount);
+    }
+
 }
