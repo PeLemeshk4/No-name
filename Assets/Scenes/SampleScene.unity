@@ -637,8 +637,13 @@ GameObject:
   - component: {fileID: 931150976}
   - component: {fileID: 931150975}
   - component: {fileID: 931150974}
-  - component: {fileID: 931150973}
   - component: {fileID: 931150972}
+  - component: {fileID: 931150973}
+  - component: {fileID: 931150981}
+  - component: {fileID: 931150980}
+  - component: {fileID: 931150978}
+  - component: {fileID: 931150979}
+  - component: {fileID: 931150982}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -688,13 +693,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a750ab47f8bfb78408325606be77c8d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
-  speed: 5
-  jumpPower: 300
-  maxStamina: 100
-  staminaRecovery: 10
-  slowingFactor: 0.3
-  slowingCost: 50
-  playerInterface: {fileID: 2003844221}
+  moveAbility: {fileID: 931150981}
+  jumpAbility: {fileID: 931150980}
+  staminaController: {fileID: 931150978}
+  timeSlowAbility: {fileID: 931150979}
+  dashAbility: {fileID: 931150982}
 --- !u!50 &931150974
 Rigidbody2D:
   serializedVersion: 5
@@ -842,6 +845,80 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &931150978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 931150971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75d82bb5c1bdbbe4aa27ed16cb94f904, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaminaController
+  maxValue: 100
+  regenRate: 10
+--- !u!114 &931150979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 931150971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3063891ad4b99ba4a9acbbb1238d869c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimeSlowAbility
+  factor: 0.3
+  cost: 50
+  thresholdPercent: 0.2
+  staminaController: {fileID: 931150978}
+--- !u!114 &931150980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 931150971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5af63fb6c93ca7c4bae93f1b9c6c0bd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::JumpAbility
+  power: 300
+  rb: {fileID: 931150974}
+--- !u!114 &931150981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 931150971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fe462bec826f5944ae5d6a9ec8db5aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoveAbility
+  speed: 5
+  rb: {fileID: 931150974}
+--- !u!114 &931150982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 931150971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d2e1af3ff6eaf447becd2d07857adf1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DashAbility
+  power: 300
+  cost: 50
+  rb: {fileID: 931150974}
+  staminaController: {fileID: 0}
 --- !u!1 &1246835016
 GameObject:
   m_ObjectHideFlags: 0
@@ -1263,10 +1340,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 2003844216}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb71ddebb974f43449400cc6aa5043e4, type: 3}
+  m_Script: {fileID: 11500000, guid: 744bb0b91a4ada8438b1137d49b29243, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Interface
-  staminaS: {fileID: 1926496584}
+  m_EditorClassIdentifier: Assembly-CSharp::StaminaSlider
+  staminaSlider: {fileID: 1926496584}
+  staminaController: {fileID: 931150978}
 --- !u!1 &2100348449
 GameObject:
   m_ObjectHideFlags: 0

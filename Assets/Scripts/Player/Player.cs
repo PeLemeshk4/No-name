@@ -5,16 +5,12 @@ using static UnityEngine.Rendering.DebugUI;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private float speed = 5.0f;
-    [SerializeField] private float jumpPower = 300.0f;
-    [SerializeField] private float maxStamina = 100f;
-    [SerializeField] private float staminaRecovery = 10f;
-    [SerializeField] private float slowingFactor = 0.3f;
-    [SerializeField] private float slowingCost = 50f;
-    private float direction = 0;
-    private float stamina;
+    [SerializeField] private MoveAbility moveAbility;
+    [SerializeField] private JumpAbility jumpAbility;
+    [SerializeField] private StaminaController staminaController;
+    [SerializeField] private TimeSlowAbility timeSlowAbility;
+    [SerializeField] private DashAbility dashAbility;
 
-    public Interface playerInterface;
     private Rigidbody2D rb;
     private PlayerInput playerInput;
 
@@ -26,90 +22,39 @@ public class Player : MonoBehaviour
         
         playerInput = GetComponent<PlayerInput>();
         playerInput.actions["Slowing"].canceled += OnSlowingCanceled;
+
+        moveAbility = GetComponent<MoveAbility>();
+        jumpAbility = GetComponent<JumpAbility>();
+        staminaController = GetComponent<StaminaController>();
+        timeSlowAbility = GetComponent<TimeSlowAbility>();
+        dashAbility = GetComponent<DashAbility>();
     }
 
     private void OnMove(InputValue value)
     {
-        direction = value.Get<float>();
+        moveAbility.Direction = value.Get<float>();
     }
 
-    private bool onGround = false;
     private void OnJump()
     {
-        if (onGround)
-        {
-            rb.AddForceY(jumpPower);
-            onGround = false;
-        }
+        jumpAbility.Jump();
     }
 
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        Vector2 normal = collision.contacts[0].normal;
-        if (normal.y > 0)
-        {
-            onGround = true;
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.contacts.Length != 0)
-        {
-            Vector2 normal = collision.contacts[0].normal;
-            if (normal.y == 0)
-            {
-                onGround = false;
-            }
-        }
-        else
-        {
-            onGround = false;
-        }
-    }
-
-    private bool isSlowing = false;
     private void OnSlowing()
     {
-        if (stamina > maxStamina * 0.2f || isSlowing)
-        {
-            isSlowing = true;
-            Time.timeScale = slowingFactor;
-        }
+        timeSlowAbility.IsActive = true;
     }
 
     private void OnSlowingCanceled(InputAction.CallbackContext context)
     {
-        Time.timeScale = 1f;
-        isSlowing = false;
+        timeSlowAbility.IsActive = false;
     }
 
-    private void FixedUpdate()
+    private void OnDash()
     {
-        rb.linearVelocityX = direction * speed;
-
-        if (isSlowing)
-        {
-            stamina -= Time.fixedDeltaTime / Time.timeScale * slowingCost;
-            if (stamina <= 0)
-            {
-                Time.timeScale = 1f;
-                isSlowing = false;
-            }
-        }
-        else
-        {
-            if (stamina < maxStamina)
-            {
-                stamina += Time.fixedDeltaTime * staminaRecovery;
-                if (stamina > maxStamina)
-                {
-                    stamina = maxStamina;
-                }
-            }
-        }
-        playerInterface.staminaS.value =
-            stamina / maxStamina * playerInterface.staminaS.maxValue;
+        Vector2 playerPosition = new Vector2(transform.position.x, transform.position.y);
+        Vector2 cursorPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        Vector2 direction = cursorPosition - playerPosition;
+        dashAbility.Dash(direction);
     }
-
 }
