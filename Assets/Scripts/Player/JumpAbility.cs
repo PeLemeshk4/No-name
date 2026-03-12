@@ -2,29 +2,30 @@ using UnityEngine;
 
 public class JumpAbility : MonoBehaviour
 {
+    [SerializeField] private MovementSystem movementSystem;
     [SerializeField] private float power = 300.0f;
-    [SerializeField] private Rigidbody2D rb;
 
     private bool onGround;
 
     private void Awake()
     {
+        movementSystem = GetComponent<MovementSystem>();
+
         onGround = false;
-        rb = GetComponent<Rigidbody2D>();
     }
 
     public void Jump()
     {
         if (onGround)
         {
-            rb.AddForceY(power);
+            movementSystem.Jump(power);
         }
     }
 
     private void OnCollisionStay2D(Collision2D collision)
     {
         Vector2 normal = collision.contacts[0].normal;
-        if (normal.y > 0)
+        if (normal.y >= 0.4f)
         {
             onGround = true;
         }

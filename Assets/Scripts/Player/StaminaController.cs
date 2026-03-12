@@ -25,12 +25,13 @@ public class StaminaController : MonoBehaviour
         {          
             if (value < maxValue)
             {
-                value += regenRate * Time.fixedDeltaTime;
-                
-                if (value > maxValue)
+                if (value + regenRate * Time.fixedDeltaTime <= maxValue)
+                {
+                    value += regenRate * Time.fixedDeltaTime;
+                }
+                else
                 {
                     value = maxValue;
-                    isRegenActive = false;
                 }
             }            
         }
@@ -38,7 +39,7 @@ public class StaminaController : MonoBehaviour
 
     public bool TryConsume(float amount)
     {
-        if (value < amount) return false;
+        if (value <= amount) return false;
         value -= amount;
         return true;
     }

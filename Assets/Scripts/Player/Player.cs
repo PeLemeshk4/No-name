@@ -54,7 +54,7 @@ public class Player : MonoBehaviour
     {
         Vector2 playerPosition = new Vector2(transform.position.x, transform.position.y);
         Vector2 cursorPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-        Vector2 direction = cursorPosition - playerPosition;
+        Vector2 direction = (cursorPosition - playerPosition).normalized;
         dashAbility.Dash(direction);
     }
 }

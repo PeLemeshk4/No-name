@@ -32,6 +32,7 @@ public class TimeSlowAbility : MonoBehaviour
     private void Awake()
     {
         isActive = false;
+
         staminaController = GetComponent<StaminaController>();
     }
 

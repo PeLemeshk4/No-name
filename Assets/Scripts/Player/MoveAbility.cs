@@ -2,11 +2,10 @@ using UnityEngine;
 
 public class MoveAbility : MonoBehaviour
 {
+    [SerializeField] private MovementSystem movementSystem;
     [SerializeField] private float speed = 5.0f;
-    [SerializeField] private Rigidbody2D rb;
 
     private float direction;
-    private bool isUpdateDirection;
 
     public float Direction 
     {
@@ -17,23 +16,18 @@ public class MoveAbility : MonoBehaviour
         set
         {
             direction = value;
-            isUpdateDirection = true;
         }
     }
 
     private void Awake()
     {
+        movementSystem = GetComponent<MovementSystem>();
+
         direction = 0.0f;
-        isUpdateDirection = false;
-        rb = GetComponent<Rigidbody2D>();
     }
 
     private void FixedUpdate()
     {
-        if (isUpdateDirection)
-        {
-            rb.linearVelocityX = direction * speed;
-            isUpdateDirection = false;
-        }
+        movementSystem.Move = direction * speed * Time.fixedDeltaTime;
     }
 }
