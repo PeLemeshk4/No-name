@@ -1,28 +1,15 @@
 using UnityEngine;
 
-public class StaminaController : MonoBehaviour
+public class StaminaController : Controller
 {
-    [SerializeField] private float maxValue = 100.0f;
     [SerializeField] private float regenRate = 10.0f;
 
-    public float MaxValue { get { return maxValue; }  }
-
-    private float value;
-    private bool isRegenActive;
-
-    public float Value { get { return value; } }
-    public bool IsRegenActive { get; set; }
-
-    private void Awake()
-    {
-        value = maxValue;
-        isRegenActive = true;
-    }
+    private bool isRegenActive = true;
 
     private void FixedUpdate()
     {
         if (isRegenActive)
-        {          
+        {
             if (value < maxValue)
             {
                 if (value + regenRate * Time.fixedDeltaTime <= maxValue)
@@ -35,10 +22,15 @@ public class StaminaController : MonoBehaviour
                 }
             }            
         }
+        else
+        {
+            isRegenActive = true;
+        }         
     }
 
-    public bool TryConsume(float amount)
+    public override bool TryConsume(float amount)
     {
+        isRegenActive = false;
         if (value <= amount) return false;
         value -= amount;
         return true;

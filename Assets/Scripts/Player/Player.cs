@@ -57,4 +57,9 @@ public class Player : MonoBehaviour
         Vector2 direction = (cursorPosition - playerPosition).normalized;
         dashAbility.Dash(direction);
     }
+
+    private void OnAttack()
+    {
+
+    }
 }

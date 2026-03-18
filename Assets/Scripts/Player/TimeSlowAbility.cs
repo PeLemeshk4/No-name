@@ -23,7 +23,6 @@ public class TimeSlowAbility : MonoBehaviour
                 if (!isActive)
                 {
                     Time.timeScale = 1.0f;
-                    staminaController.IsRegenActive = true;
                 }
             }
         }
@@ -43,7 +42,6 @@ public class TimeSlowAbility : MonoBehaviour
             if (staminaController.TryConsume(cost * Time.fixedDeltaTime / factor))
             {
                 Time.timeScale = factor;
-                staminaController.IsRegenActive = false;
             }
             else
             {
