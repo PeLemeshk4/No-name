@@ -1,6 +1,15 @@
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
-public class Weapon : MonoBehaviour
+public abstract class Weapon : MonoBehaviour
 {
-    [SerializeField] private WeaponData weaponData;
+    protected WeaponData weaponData;
+
+    protected void LoadData(string name)
+    {
+        string path = "";
+        //weaponData = Addressables.LoadAssetAsync<WeaponData>(path);
+    }
+
+    public abstract void Attack();
 }
