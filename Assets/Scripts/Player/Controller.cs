@@ -10,7 +10,7 @@ public abstract class Controller : MonoBehaviour
 
     public float Value { get { return value; } }
 
-    private void Awake()
+    private void Start()
     {
         value = maxValue;
     }

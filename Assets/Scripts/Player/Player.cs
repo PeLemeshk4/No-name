@@ -10,16 +10,13 @@ public class Player : MonoBehaviour
     [SerializeField] private StaminaController staminaController;
     [SerializeField] private TimeSlowAbility timeSlowAbility;
     [SerializeField] private DashAbility dashAbility;
+    [SerializeField] private AttackAbility attackAbility;
+    [SerializeField] private Weapon weapon;
 
-    private Rigidbody2D rb;
     private PlayerInput playerInput;
 
-    private void Awake()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
-        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        
+    private void Start()
+    {   
         playerInput = GetComponent<PlayerInput>();
         playerInput.actions["Slowing"].canceled += OnSlowingCanceled;
 
@@ -28,6 +25,7 @@ public class Player : MonoBehaviour
         staminaController = GetComponent<StaminaController>();
         timeSlowAbility = GetComponent<TimeSlowAbility>();
         dashAbility = GetComponent<DashAbility>();
+        attackAbility = GetComponent<AttackAbility>();
     }
 
     private void OnMove(InputValue value)
@@ -51,15 +49,17 @@ public class Player : MonoBehaviour
     }
 
     private void OnDash()
-    {
-        Vector2 playerPosition = new Vector2(transform.position.x, transform.position.y);
-        Vector2 cursorPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-        Vector2 direction = (cursorPosition - playerPosition).normalized;
-        dashAbility.Dash(direction);
+    {       
+        dashAbility.Dash();
     }
 
     private void OnAttack()
     {
+        attackAbility.Attack();
+    }
 
+    private void OnParry()
+    {
+        timeSlowAbility.TryParry();
     }
 }

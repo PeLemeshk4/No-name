@@ -4,9 +4,9 @@ public class MovementSystem : MonoBehaviour
 {
     [SerializeField] private Rigidbody2D rb;
 
-    private float move;
-    private Vector2 dash;
-    private bool isDash;
+    private float move = 0.0f;
+    private Vector2 dash = Vector2.zero;
+    private bool isDash = false;
 
     public float Move
     {
@@ -28,17 +28,30 @@ public class MovementSystem : MonoBehaviour
         set
         {
             dash = value;
-            isDash = true;
+            if (dash == Vector2.zero)
+            {
+                rb.linearVelocity = dash;
+                isDash = false;
+            }
+            else
+            {
+                isDash = true;
+            }    
+        }
+    }
+    public bool IsDash
+    {
+        get
+        {
+            return isDash;
         }
     }
 
-    private void Awake()
+    private void Start()
     {
-        move = 0.0f;
-        dash = Vector2.zero;
-        isDash = false;
-
         rb = GetComponent<Rigidbody2D>();
+        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
     }
 
     private void FixedUpdate()
@@ -46,7 +59,6 @@ public class MovementSystem : MonoBehaviour
         if (isDash)
         {
             rb.linearVelocity = dash;
-            isDash = false;
         }
         else
         {

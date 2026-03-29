@@ -5,13 +5,11 @@ public class JumpAbility : MonoBehaviour
     [SerializeField] private MovementSystem movementSystem;
     [SerializeField] private float power = 300.0f;
 
-    private bool onGround;
+    private bool onGround = false;
 
-    private void Awake()
+    private void Start()
     {
         movementSystem = GetComponent<MovementSystem>();
-
-        onGround = false;
     }
 
     public void Jump()

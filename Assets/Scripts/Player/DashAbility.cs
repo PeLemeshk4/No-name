@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class DashAbility : MonoBehaviour
 {
@@ -8,16 +9,13 @@ public class DashAbility : MonoBehaviour
     [SerializeField] private float cost = 50.0f;
     [SerializeField] private StaminaController staminaController;
 
-    private bool isDash;
+    private bool isDash = false;
     private Vector2 direction;
     private float time = 0.0f;
 
-    private void Awake()
+    private void Start()
     {
         movementSystem = GetComponent<MovementSystem>();
-
-        isDash = false;
-        time = 0.0f;
 
         staminaController = GetComponent<StaminaController>();
     }
@@ -36,11 +34,13 @@ public class DashAbility : MonoBehaviour
         }
     }
 
-    public void Dash(Vector2 dashDirection)
+    public void Dash()
     {
         if (staminaController.TryConsume(cost))
         {
-            direction = dashDirection * speed;
+            Vector2 playerPosition = new Vector2(transform.position.x, transform.position.y);
+            Vector2 cursorPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+            direction = (cursorPosition - playerPosition).normalized * speed;
             isDash = true;
             time = 0.0f;
         }

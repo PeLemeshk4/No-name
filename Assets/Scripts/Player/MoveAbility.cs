@@ -5,7 +5,7 @@ public class MoveAbility : MonoBehaviour
     [SerializeField] private MovementSystem movementSystem;
     [SerializeField] private float speed = 5.0f;
 
-    private float direction;
+    private float direction = 0.0f;
 
     public float Direction 
     {
@@ -19,11 +19,9 @@ public class MoveAbility : MonoBehaviour
         }
     }
 
-    private void Awake()
+    private void Start()
     {
         movementSystem = GetComponent<MovementSystem>();
-
-        direction = 0.0f;
     }
 
     private void FixedUpdate()
