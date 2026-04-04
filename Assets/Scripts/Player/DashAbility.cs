@@ -7,6 +7,7 @@ public class DashAbility : MonoBehaviour
     [SerializeField] private float length = 300.0f;
     [SerializeField] private float speed = 1.0f;
     [SerializeField] private float cost = 50.0f;
+    [SerializeField] private float powerOfBounce = 1.0f;
     [SerializeField] private StaminaController staminaController;
 
     private bool isDash = false;
@@ -31,6 +32,18 @@ public class DashAbility : MonoBehaviour
                 movementSystem.Dash = Vector2.zero;
                 isDash = false;
             }
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (isDash)
+        {       
+            isDash = false;
+            movementSystem.Dash = Vector2.zero;
+            Vector2 normal = collision.contacts[0].normal;
+            Vector2 directionBounce = direction - 2.0f * Vector2.Dot(direction, normal) * normal;
+            movementSystem.Bounce(speed * powerOfBounce, directionBounce.normalized);
         }
     }
 
