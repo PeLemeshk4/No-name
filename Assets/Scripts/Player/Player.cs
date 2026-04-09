@@ -49,13 +49,19 @@ public class Player : MonoBehaviour
     }
 
     private void OnDash()
-    {       
-        dashAbility.Dash();
+    {
+        Vector2 playerPosition = new Vector2(transform.position.x, transform.position.y);
+        Vector2 cursorPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        Vector2 direction = (cursorPosition - playerPosition).normalized;
+        dashAbility.Dash(direction);
     }
 
     private void OnAttack()
     {
-        attackAbility.Attack();
+        Vector2 playerPosition = new Vector2(transform.position.x, transform.position.y);
+        Vector2 cursorPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        Vector2 direction = (cursorPosition - playerPosition).normalized;
+        attackAbility.Attack(direction);
     }
 
     private void OnParry()

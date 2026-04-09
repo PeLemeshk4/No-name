@@ -2,13 +2,10 @@ using UnityEngine;
 
 public class Spear : Weapon
 {
-    private async void Awake()
-    {
-        await LoadData(DataPaths.SpearData);
-    }
+    protected override string Path => DataPaths.SpearData;
 
-    public override void Attack()
+    public override void Attack(Vector2 attackDirection)
     {
-        throw new System.NotImplementedException();
+        Debug.Log(weaponData.Damage);
     }
 }

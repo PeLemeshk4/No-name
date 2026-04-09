@@ -1,14 +1,29 @@
 using System.Threading.Tasks;
+using UnityEditor.Compilation;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 public abstract class Weapon : MonoBehaviour
 {
-    protected WeaponData weaponData;
+    protected abstract string Path { get; }
 
-    protected async Task LoadData(string path)
+    protected WeaponData weaponData;
+    protected Attack attack;
+
+    protected bool isAttacking = false;
+
+    private async void Awake()
     {
-        var operation = Addressables.LoadAssetAsync<WeaponData>(path);
+        await LoadData();
+
+        attack = gameObject.AddComponent<Attack>();
+        attack.Damage = weaponData.Damage;
+        attack.enabled = false;
+    }
+
+    protected async Task LoadData()
+    {
+        var operation = Addressables.LoadAssetAsync<WeaponData>(Path);
 
         try
         {
@@ -17,10 +32,10 @@ public abstract class Weapon : MonoBehaviour
         }
         catch
         {
-            Debug.LogError($"Failed to load weapon data by link: {path}");
+            Debug.LogError($"Failed to load weapon data by link: {Path}");
             weaponData = null;
-        }       
+        }
     }
 
-    public abstract void Attack();
+    public abstract void Attack(Vector2 attackDirection);
 }
