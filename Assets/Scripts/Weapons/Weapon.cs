@@ -3,39 +3,53 @@ using UnityEditor.Compilation;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-public abstract class Weapon : MonoBehaviour
+public class Weapon : MonoBehaviour
 {
-    protected abstract string Path { get; }
-
     protected WeaponData weaponData;
     protected Attack attack;
-
     protected bool isAttacking = false;
 
-    private async void Awake()
+    public WeaponData WeaponData
     {
-        await LoadData();
+        get
+        {
+            return weaponData;
+        }
+        set
+        {
+            weaponData = value;
+            UpdateWeapon();
+        }
+    }
 
+    private void Awake()
+    {
         attack = gameObject.AddComponent<Attack>();
-        attack.Damage = weaponData.Damage;
         attack.enabled = false;
     }
 
-    protected async Task LoadData()
+    private void UpdateWeapon()
     {
-        var operation = Addressables.LoadAssetAsync<WeaponData>(Path);
-
-        try
-        {
-            await operation.Task;
-            weaponData = operation.Result;
-        }
-        catch
-        {
-            Debug.LogError($"Failed to load weapon data by link: {Path}");
-            weaponData = null;
-        }
+        attack.Damage = weaponData.Damage;
     }
 
-    public abstract void Attack(Vector2 attackDirection);
+    public void Attack(Vector2 attackDirection)
+    {
+        if (weaponData == null) return;
+        if (isAttacking) return;
+
+        float weaponRotate;
+
+        if (Mathf.Abs(attackDirection.x) >= Mathf.Abs(attackDirection.y))
+            weaponRotate = attackDirection.x >= 0 ? -90.0f : 90.0f;
+        else
+            weaponRotate = attackDirection.y >= 0 ? 0.0f : 180.0f;
+
+        transform.eulerAngles = new Vector3(0, 0, weaponRotate);
+
+        isAttacking = true;
+        attack.enabled = true;
+
+        Debug.Log(weaponData.Damage);
+    }
 }

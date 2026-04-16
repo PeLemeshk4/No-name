@@ -3,7 +3,6 @@ using static UnityEngine.GraphicsBuffer;
 
 public class Sword : Weapon
 {
-    protected override string Path => DataPaths.SwordData;
 
     protected float rotateValue = 0.0f;
     protected float rotateSpeed = 0.0f;
@@ -29,7 +28,7 @@ public class Sword : Weapon
         }
     }
 
-    public override void Attack(Vector2 attackDirection)
+    public void Attacks(Vector2 attackDirection)
     {
         if (isAttacking) return;
 

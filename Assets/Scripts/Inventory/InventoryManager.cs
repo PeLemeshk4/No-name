@@ -7,14 +7,10 @@ using UnityEngine;
 public class InventoryManager : MonoBehaviour
 {
     private List<Weapon> weapons = new List<Weapon>();
-    private GameObject inventory;
     private ActiveWeapon activeWeapon;
 
     private void Awake()
     {
-        inventory = new GameObject("Inventory");
-        inventory.transform.SetParent(transform, false);
-
         activeWeapon = gameObject.AddComponent<ActiveWeapon>();
     }
 
@@ -32,7 +28,7 @@ public class InventoryManager : MonoBehaviour
 
         if (HasWeaponType(weapon)) return false;
 
-        GameObject weaponInstance = Instantiate(weaponCandidate, inventory.transform);
+        GameObject weaponInstance = Instantiate(weaponCandidate);
         weaponInstance.name = weapon.GetType().Name;
 
         weapons.Add(weaponInstance.GetComponent<Weapon>());
@@ -43,10 +39,5 @@ public class InventoryManager : MonoBehaviour
     public void OnAddWeapon(GameObject weaponCandidate)
     {
         AddWeapon(weaponCandidate);
-    }
-
-    public void SetActiveWeapon(int index)
-    {
-        activeWeapon.Weapon = weapons[index];
     }
 }

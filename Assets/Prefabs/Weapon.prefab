@@ -11,10 +11,9 @@ GameObject:
   - component: {fileID: 6578318215648847786}
   - component: {fileID: 4461783958639593483}
   - component: {fileID: 3003985265764577633}
-  - component: {fileID: 8695756113359795924}
-  - component: {fileID: 7639238133376954025}
+  - component: {fileID: -9166541129652993662}
   m_Layer: 0
-  m_Name: Sword
+  m_Name: Weapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -132,7 +131,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 2, y: 2}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -140,7 +139,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.25, y: 2}
   m_EdgeRadius: 0
---- !u!114 &8695756113359795924
+--- !u!114 &-9166541129652993662
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -149,18 +148,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 8435928114246105755}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0644db01a400844d973004e50b0906e, type: 3}
+  m_Script: {fileID: 11500000, guid: 37e2fbd6ed8c14e4281099eb66accb6b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Sword
---- !u!114 &7639238133376954025
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8435928114246105755}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e329d368dc79e204badf316662b636a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Attack
+  m_EditorClassIdentifier: Assembly-CSharp::Weapon
