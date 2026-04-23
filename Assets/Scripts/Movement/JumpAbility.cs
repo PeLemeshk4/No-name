@@ -7,7 +7,7 @@ public class JumpAbility : MonoBehaviour
 
     private bool onGround = false;
 
-    private void Start()
+    private void Awake()
     {
         movementSystem = GetComponent<MovementSystem>();
     }

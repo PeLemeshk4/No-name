@@ -4,7 +4,7 @@ public class AttackHandler : MonoBehaviour
 {
     private HealthController healthController;
 
-    private void Start()
+    private void Awake()
     {
         healthController = GetComponent<HealthController>();
     }
@@ -12,5 +12,6 @@ public class AttackHandler : MonoBehaviour
     public void TryProcessAttack(float damage)
     {
         healthController?.TryConsume(damage);
+        Debug.Log(gameObject.name + ": " + damage);
     }
 }

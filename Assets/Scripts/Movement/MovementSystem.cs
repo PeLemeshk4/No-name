@@ -52,7 +52,7 @@ public class MovementSystem : MonoBehaviour
         }
     }
 
-    private void Start()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;

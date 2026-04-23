@@ -15,11 +15,6 @@ MonoBehaviour:
   m_GroupName: WeaponDataGroup
   m_GUID: 502fd7bce1c4a3c448ceefd1b4e154b6
   m_SerializeEntries:
-  - m_GUID: 6ad9c7b4a72c43e4f8a32616f2052472
-    m_Address: Weapon/SpearData
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d0cc8f4368f9c574daf2652cabdffae9
     m_Address: Weapon/SwordData
     m_ReadOnly: 0

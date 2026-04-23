@@ -7,25 +7,43 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private MoveAbility moveAbility;
     [SerializeField] private JumpAbility jumpAbility;
-    [SerializeField] private StaminaController staminaController;
     [SerializeField] private TimeSlowAbility timeSlowAbility;
     [SerializeField] private DashAbility dashAbility;
+    [SerializeField] private ActiveWeapon activeWeapon;
     [SerializeField] private AttackAbility attackAbility;
-    [SerializeField] private Weapon weapon;
+    [SerializeField] private ParryAbility parryAbility;
+
+    [SerializeField] private GameObject look;
 
     private PlayerInput playerInput;
+    private Vector2 lookDirection = Vector2.zero;
 
-    private void Start()
+    private void Awake()
     {   
         playerInput = GetComponent<PlayerInput>();
         playerInput.actions["Slowing"].canceled += OnSlowingCanceled;
 
         moveAbility = GetComponent<MoveAbility>();
         jumpAbility = GetComponent<JumpAbility>();
-        staminaController = GetComponent<StaminaController>();
         timeSlowAbility = GetComponent<TimeSlowAbility>();
         dashAbility = GetComponent<DashAbility>();
+        activeWeapon = GetComponent<ActiveWeapon>();
         attackAbility = GetComponent<AttackAbility>();
+        parryAbility = GetComponent<ParryAbility>();
+    }
+
+    private void FixedUpdate()
+    {
+        Vector2 deltaMouse = Mouse.current.delta.ReadValue();
+
+        if (deltaMouse == Vector2.zero || deltaMouse.magnitude <= 5.0f) return;
+
+        lookDirection = deltaMouse.normalized;
+        float newZ = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg - 90.0f;
+        look.transform.eulerAngles = new Vector3(0, 0, newZ);
+
+        if (activeWeapon != null) 
+            activeWeapon.SetWeaponDirection(lookDirection);
     }
 
     private void OnMove(InputValue value)
@@ -50,22 +68,18 @@ public class Player : MonoBehaviour
 
     private void OnDash()
     {
-        Vector2 playerPosition = new Vector2(transform.position.x, transform.position.y);
-        Vector2 cursorPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-        Vector2 direction = (cursorPosition - playerPosition).normalized;
-        dashAbility.Dash(direction);
+        dashAbility.Dash(lookDirection);
     }
 
     private void OnAttack()
     {
-        Vector2 playerPosition = new Vector2(transform.position.x, transform.position.y);
-        Vector2 cursorPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-        Vector2 direction = (cursorPosition - playerPosition).normalized;
-        attackAbility.Attack(direction);
+        activeWeapon.SetWeaponDirection(lookDirection);
+        attackAbility.Attack(activeWeapon.Weapon);
     }
 
     private void OnParry()
     {
-        timeSlowAbility.TryParry();
+        activeWeapon.SetWeaponDirection(lookDirection);
+        parryAbility.Parry(activeWeapon.Weapon);
     }
 }

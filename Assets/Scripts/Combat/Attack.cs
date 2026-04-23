@@ -6,11 +6,11 @@ using static UnityEngine.Rendering.DebugUI;
 
 public class AttackHitEventsArgs : EventArgs
 {
-    public Weapon NewWeapon { get; }
+    public GameObject Target { get; }
 
-    public AttackHitEventsArgs(Weapon newWeapon)
+    public AttackHitEventsArgs(GameObject target)
     {
-        NewWeapon = newWeapon;
+        Target = target;
     }
 }
 
@@ -62,14 +62,14 @@ public class Attack : MonoBehaviour
         if (closest)
         {
             closest.TryProcessAttack(damage);
-            
+            AttackHit?.Invoke(this, new AttackHitEventsArgs(closest?.gameObject));
         }          
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
         if (!collision.gameObject.TryGetComponent<AttackHandler>(out AttackHandler attackHandler)) return;
-
+        Debug.Log(collision.gameObject);
         collided.Add(attackHandler);
     }
 }

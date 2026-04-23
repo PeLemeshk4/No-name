@@ -19,7 +19,7 @@ public class MoveAbility : MonoBehaviour
         }
     }
 
-    private void Start()
+    private void Awake()
     {
         movementSystem = GetComponent<MovementSystem>();
     }

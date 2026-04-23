@@ -14,4 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
   damage: 5
   length: 2
+  width: 0.25
   attackDuration: 0.33
+  attackStages: {x: 20, y: 60, z: 20}

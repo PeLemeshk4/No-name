@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AttackAbility : MonoBehaviour
+public class ParryAbility : MonoBehaviour
 {
     [SerializeField] private CombatSystem combatSystem;
 
@@ -9,8 +9,8 @@ public class AttackAbility : MonoBehaviour
         combatSystem = GetComponent<CombatSystem>();
     }
 
-    public void Attack(Weapon weapon)
+    public void Parry(Weapon weapon)
     {
-        combatSystem.TryAttack(weapon);
+        combatSystem.TryParry(weapon);
     }
 }

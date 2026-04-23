@@ -14,7 +14,7 @@ public class DashAbility : MonoBehaviour
     private Vector2 dashDirection;
     private float time = 0.0f;
 
-    private void Start()
+    private void Awake()
     {
         movementSystem = GetComponent<MovementSystem>();
 
@@ -35,10 +35,12 @@ public class DashAbility : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionStay2D(Collision2D collision)
     {
         if (isDash)
-        {       
+        {
+            if (Vector2.Angle(dashDirection, collision.contacts[0].normal) <= 90.0f) return;
+
             isDash = false;
             movementSystem.Dash = Vector2.zero;
             Vector2 normal = collision.contacts[0].normal;
