@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI;
 
@@ -8,18 +9,22 @@ public class AttackHitEventsArgs : EventArgs
 {
     public GameObject Target { get; }
 
-    public AttackHitEventsArgs(GameObject target)
+    public List<Attack> Attacks {  get; }
+
+    public AttackHitEventsArgs(GameObject target, List<Attack> attacks)
     {
         Target = target;
+        Attacks = attacks;
     }
 }
 
 public class Attack : MonoBehaviour
 {
-    private List<AttackHandler> collided = new List<AttackHandler>();
-
     public event EventHandler<AttackHitEventsArgs> AttackHit;
 
+    private List<AttackHandler> collided = new List<AttackHandler>();
+    private List<Attack> attacks = new List<Attack>();
+    private Collider2D attackCollider;
     private float damage = 0;
 
     public float Damage
@@ -34,13 +39,28 @@ public class Attack : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        attackCollider = GetComponent<Collider2D>();
+    }
+
     private void OnEnable()
     {
         collided.Clear();
+        attacks.Clear();
     }
 
-    private void LateUpdate()
+    private void Update()
     {
+        Debug.Log(enabled);
+        Debug.Log(2);
+        CheckForActiveContacts();
+        Debug.Log(3);
+        if (attacks.Count != 0)
+        {
+            AttackHit?.Invoke(this, new AttackHitEventsArgs(null, attacks));
+        }
+
         if (collided.Count == 0) return;
 
         Transform self = transform;
@@ -62,14 +82,27 @@ public class Attack : MonoBehaviour
         if (closest)
         {
             closest.TryProcessAttack(damage);
-            AttackHit?.Invoke(this, new AttackHitEventsArgs(closest?.gameObject));
-        }          
+            AttackHit?.Invoke(this, new AttackHitEventsArgs(closest?.gameObject, null));
+        }
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private void CheckForActiveContacts()
     {
-        if (!collision.gameObject.TryGetComponent<AttackHandler>(out AttackHandler attackHandler)) return;
-        Debug.Log(collision.gameObject);
-        collided.Add(attackHandler);
+        List<Collider2D> colliders = new List<Collider2D>();
+        Physics2D.OverlapCollider(attackCollider, colliders);
+
+        foreach (Collider2D c in colliders)
+        {
+            if (c.gameObject == gameObject) return;
+            if (c.gameObject.TryGetComponent<AttackHandler>(out AttackHandler attackHandler))
+            {
+                collided.Add(attackHandler);
+            }
+            else if (c.gameObject.TryGetComponent<Attack>(out Attack attack))
+            {
+                attacks.Add(attack);
+            }
+        }
+        Debug.Log(1);
     }
 }

@@ -6,12 +6,14 @@ using UnityEngine.AddressableAssets;
 
 public class Weapon : MonoBehaviour
 {
-    protected WeaponData weaponData;
-    protected BoxCollider2D attackCollider;
-    protected Attack attack;
-    private ParryZone parryZone;
-    protected bool isAttacking = false;
-    protected float attackTime = 0.0f;
+    private WeaponData weaponData;
+    private BoxCollider2D attackCollider;
+    private Attack attack;
+    private Vector3 attackStages;
+    private bool isAttacking = false;
+    private float attackTime = 0.0f;
+    private bool hasAttacked = false;
+
 
     public WeaponData WeaponData
     {
@@ -43,20 +45,27 @@ public class Weapon : MonoBehaviour
         attack = gameObject.AddComponent<Attack>();
         attack.enabled = false;
         attack.AttackHit += OnAttackHit;
-
-        parryZone = gameObject.AddComponent<ParryZone>();
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         if (isAttacking)
         {
-            attackTime += Time.fixedDeltaTime;
-            if (attackTime >= weaponData.AttackDuration)
+            attackTime += Time.deltaTime;
+            if (attackTime >= WeaponData.AttackDuration || hasAttacked)
             {
                 isAttacking = false;
-                attack.enabled = false;
                 attackTime = 0.0f;
+                return;
+            }
+
+            if (attackTime >= attackStages.x + attackStages.y)
+            {
+                attack.enabled = false;
+            }
+            else if (attackTime >= attackStages.x)
+            {
+                attack.enabled = true; 
             }
         }
     }
@@ -66,11 +75,27 @@ public class Weapon : MonoBehaviour
         attack.Damage = weaponData.Damage;
         attackCollider.size = new Vector2(weaponData.Width, weaponData.Length);
         attackCollider.offset = new Vector2(0, weaponData.Length / 2);
+        attackStages = weaponData.AttackStages;
     }
 
     private void OnAttackHit(object sender, AttackHitEventsArgs e)
     {
         attack.enabled = false;
+        if (e.Attacks != null)
+        {
+            List<Attack> attacks = e.Attacks;
+            for(int i = attacks.Count - 1; i >= 0; i--)
+            {
+                if (!attacks[i]) continue;
+                attacks[i].gameObject.SetActive(false);
+            }
+            Debug.Log("Parry");
+        }
+        else
+        {
+            Debug.Log("Attack");
+        }
+        hasAttacked = true;
     }
 
     public void Attack()
@@ -78,27 +103,7 @@ public class Weapon : MonoBehaviour
         if (weaponData == null) return;
         if (isAttacking) return;
 
+        hasAttacked = false;
         isAttacking = true;
-        attack.enabled = true;
-
-        Debug.Log(weaponData.Damage);
-    }
-
-    public void Parry()
-    {
-        if (weaponData == null) return;
-        if (isAttacking) return;
-
-        List<GameObject> attacks = parryZone.Attacks;
-
-        for (int i = attacks.Count - 1; i >= 0; i--)
-        {
-            GameObject attack = attacks[i];
-            if (attack != null)
-            {
-                attacks.RemoveAt(i);
-                Destroy(attack);
-            }
-        }
     }
 }

@@ -652,6 +652,7 @@ GameObject:
   - component: {fileID: 568603866}
   - component: {fileID: 568603865}
   - component: {fileID: 568603864}
+  - component: {fileID: 568603867}
   m_Layer: 0
   m_Name: Circle
   m_TagString: Attack
@@ -769,6 +770,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &568603867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 568603863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e329d368dc79e204badf316662b636a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Attack
 --- !u!1001 &583509249
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -10,11 +10,21 @@ public class WeaponData : ScriptableObject
     [SerializeField] private float width;
     [Range(0.01f, 5f)]
     [SerializeField] private float attackDuration;
-    [SerializeField] private Vector3Int attackStages = new(20, 60, 20);
+    [SerializeField] private Vector3 attackStages = new(20, 60, 20);
 
     public float Damage {  get { return damage; } }
     public float Length { get { return length; } }
     public float Width { get { return width; } }
     public float AttackDuration { get { return attackDuration; } }
-    public Vector3Int AttackStages { get { return attackStages; } }
+    public Vector3 AttackStages
+    {
+        get
+        {
+            float sum = attackStages.x + attackStages.y + attackStages.z;
+            float x = attackStages.x / sum * attackDuration;
+            float y = attackStages.y / sum * attackDuration;
+            float z = attackStages.z / sum * attackDuration;
+            return new Vector3(x, y, z);
+        }
+    }
 }

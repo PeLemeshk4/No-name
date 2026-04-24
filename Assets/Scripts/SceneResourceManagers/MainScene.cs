@@ -11,7 +11,7 @@ public class MainScene : MonoBehaviour
         foreach (string path in paths)
         {
             StartCoroutine(AssetLoader.LoadAsync<GameObject>(path,
-                onSuccess: name => Debug.Log(name),
+                onSuccess: g => Debug.Log(g.name),
                 onError: message => Debug.Log(message)));
         }
 

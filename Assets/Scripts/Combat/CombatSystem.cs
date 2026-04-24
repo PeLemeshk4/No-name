@@ -13,9 +13,9 @@ public class CombatSystem : MonoBehaviour
 
     public bool TryAttack(Weapon weapon)
     {
-        if (timeSlowAbility != null && timeSlowAbility.IsActive) return false;
         if (movementSystem != null && movementSystem.IsDash) return false;
         if (weapon == null) return false;
+
         weapon.Attack();
         return true;
     }
@@ -25,7 +25,7 @@ public class CombatSystem : MonoBehaviour
         if (timeSlowAbility == null || !timeSlowAbility.IsActive) return false;
         if (movementSystem != null && movementSystem.IsDash) return false;
         if (weapon == null) return false;
-        weapon.Parry();
+        //weapon.Parry();
         return true;
     }
 }
