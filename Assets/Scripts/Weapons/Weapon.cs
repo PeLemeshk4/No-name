@@ -54,6 +54,7 @@ public class Weapon : MonoBehaviour
             attackTime += Time.deltaTime;
             if (attackTime >= WeaponData.AttackDuration || hasAttacked)
             {
+                attack.enabled = false;
                 isAttacking = false;
                 attackTime = 0.0f;
                 return;
@@ -86,7 +87,7 @@ public class Weapon : MonoBehaviour
             List<Attack> attacks = e.Attacks;
             for(int i = attacks.Count - 1; i >= 0; i--)
             {
-                if (!attacks[i]) continue;
+                if (attacks[i] == null) continue;
                 attacks[i].gameObject.SetActive(false);
             }
             Debug.Log("Parry");

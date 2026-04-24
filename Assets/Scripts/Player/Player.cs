@@ -19,11 +19,11 @@ public class Player : MonoBehaviour
     private Vector2 lookDirection = Vector2.zero;
     private float attackTime = 0.0f;
     private bool isAttacking = false;
+    private bool hasSlowing = false;
 
     private void Awake()
     {   
         playerInput = GetComponent<PlayerInput>();
-        playerInput.actions["Slowing"].canceled += OnSlowingCanceled;
         playerInput.actions["Attack"].canceled += OnAttackCanceled;
         playerInput.actions["Attack"].started += OnAttackStarted;
 
@@ -40,11 +40,12 @@ public class Player : MonoBehaviour
     {
         Vector2 deltaMouse = Mouse.current.delta.ReadValue();
 
-        if (deltaMouse == Vector2.zero || deltaMouse.magnitude <= 5.0f) return;
-
-        lookDirection = deltaMouse.normalized;
-        float newZ = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg - 90.0f;
-        look.transform.eulerAngles = new Vector3(0, 0, newZ);
+        if (!(deltaMouse == Vector2.zero || deltaMouse.magnitude <= 5.0f))
+        {
+            lookDirection = deltaMouse.normalized;
+            float newZ = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg - 90.0f;
+            look.transform.eulerAngles = new Vector3(0, 0, newZ);
+        }
 
         if (isAttacking)
         {
@@ -52,6 +53,11 @@ public class Player : MonoBehaviour
             if (attackTime > 0.05f)
             {
                 activeWeapon.SetWeaponDirection(lookDirection);
+                if (!hasSlowing)
+                {
+                    timeSlowAbility.IsActive = true;
+                    hasSlowing = true;
+                }
             }
         }
     }
@@ -64,16 +70,6 @@ public class Player : MonoBehaviour
     private void OnJump()
     {
         jumpAbility.Jump();
-    }
-
-    private void OnSlowing()
-    {
-        timeSlowAbility.IsActive = true;
-    }
-
-    private void OnSlowingCanceled(InputAction.CallbackContext context)
-    {
-        timeSlowAbility.IsActive = false;
     }
 
     private void OnDash()
@@ -100,5 +96,7 @@ public class Player : MonoBehaviour
         attackAbility.Attack(activeWeapon.Weapon);
         isAttacking = false;
         attackTime = 0.0f;
+        hasSlowing = false;
+        timeSlowAbility.IsActive = false;
     }
 }

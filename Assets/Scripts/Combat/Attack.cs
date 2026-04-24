@@ -22,7 +22,8 @@ public class Attack : MonoBehaviour
 {
     public event EventHandler<AttackHitEventsArgs> AttackHit;
 
-    private List<AttackHandler> collided = new List<AttackHandler>();
+    List<Collider2D> colliders = new List<Collider2D>();
+    private List<AttackHandler> attacked = new List<AttackHandler>();
     private List<Attack> attacks = new List<Attack>();
     private Collider2D attackCollider;
     private float damage = 0;
@@ -46,28 +47,26 @@ public class Attack : MonoBehaviour
 
     private void OnEnable()
     {
-        collided.Clear();
+        attacked.Clear();
         attacks.Clear();
     }
 
     private void Update()
     {
-        Debug.Log(enabled);
-        Debug.Log(2);
         CheckForActiveContacts();
-        Debug.Log(3);
         if (attacks.Count != 0)
         {
             AttackHit?.Invoke(this, new AttackHitEventsArgs(null, attacks));
+            attacks.Clear();
         }
 
-        if (collided.Count == 0) return;
+        if (attacked.Count == 0) return;
 
         Transform self = transform;
         AttackHandler closest = null;
         float best = float.MaxValue;
 
-        foreach (AttackHandler c in collided)
+        foreach (AttackHandler c in attacked)
         {
             if (!c) continue;
 
@@ -79,7 +78,7 @@ public class Attack : MonoBehaviour
             }
         }
 
-        if (closest)
+        if (closest != null)
         {
             closest.TryProcessAttack(damage);
             AttackHit?.Invoke(this, new AttackHitEventsArgs(closest?.gameObject, null));
@@ -88,7 +87,8 @@ public class Attack : MonoBehaviour
 
     private void CheckForActiveContacts()
     {
-        List<Collider2D> colliders = new List<Collider2D>();
+        colliders.Clear();
+
         Physics2D.OverlapCollider(attackCollider, colliders);
 
         foreach (Collider2D c in colliders)
@@ -96,13 +96,12 @@ public class Attack : MonoBehaviour
             if (c.gameObject == gameObject) return;
             if (c.gameObject.TryGetComponent<AttackHandler>(out AttackHandler attackHandler))
             {
-                collided.Add(attackHandler);
+                attacked.Add(attackHandler);
             }
             else if (c.gameObject.TryGetComponent<Attack>(out Attack attack))
             {
                 attacks.Add(attack);
             }
         }
-        Debug.Log(1);
     }
 }
