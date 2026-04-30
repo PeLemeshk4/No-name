@@ -6,6 +6,7 @@ using UnityEngine.AddressableAssets;
 
 public class Weapon : MonoBehaviour
 {
+    [SerializeField] private Animator animator;
     private WeaponData weaponData;
     private BoxCollider2D attackCollider;
     private Attack attack;
@@ -14,6 +15,13 @@ public class Weapon : MonoBehaviour
     private float attackTime = 0.0f;
     private bool hasAttacked = false;
 
+    public bool IsAttacking
+    {
+        get
+        {
+            return isAttacking;
+        }
+    }
 
     public WeaponData WeaponData
     {
@@ -38,6 +46,8 @@ public class Weapon : MonoBehaviour
     {
         gameObject.SetActive(false);
 
+        animator = GetComponent<Animator>();
+
         attackCollider = gameObject.AddComponent<BoxCollider2D>();
         attackCollider.size = Vector2.zero;
         attackCollider.isTrigger = true;
@@ -52,11 +62,19 @@ public class Weapon : MonoBehaviour
         if (isAttacking)
         {
             attackTime += Time.deltaTime;
-            if (attackTime >= WeaponData.AttackDuration || hasAttacked)
+
+            if (hasAttacked || attackTime >= WeaponData.AttackDuration)
             {
                 attack.enabled = false;
-                isAttacking = false;
-                attackTime = 0.0f;
+                
+                if (attackTime >= WeaponData.AttackDuration)
+                {
+                    isAttacking = false;
+                    attackTime = 0.0f;
+
+                    animator.SetBool("IsAttacking", isAttacking);
+                }
+
                 return;
             }
 
@@ -106,5 +124,7 @@ public class Weapon : MonoBehaviour
 
         hasAttacked = false;
         isAttacking = true;
+
+        animator.SetBool("IsAttacking", isAttacking);
     }
 }

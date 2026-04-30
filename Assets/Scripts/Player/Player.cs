@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -11,21 +12,25 @@ public class Player : MonoBehaviour
     [SerializeField] private DashAbility dashAbility;
     [SerializeField] private ActiveWeapon activeWeapon;
     [SerializeField] private AttackAbility attackAbility;
-    [SerializeField] private ParryAbility parryAbility;
 
+    [SerializeField] private CircleTimer circleTimer;
     [SerializeField] private GameObject look;
+    [SerializeField] private float timeOfAiming = 2.0f;
 
     private PlayerInput playerInput;
     private Vector2 lookDirection = Vector2.zero;
-    private float attackTime = 0.0f;
     private bool isAttacking = false;
+    private bool isDashing = false;
+    private float time = 0.0f;
     private bool hasSlowing = false;
 
     private void Awake()
     {   
         playerInput = GetComponent<PlayerInput>();
+        playerInput.actions["Dash"].started += OnDashStarted;
+        playerInput.actions["Dash"].canceled += OnDashCanceled;
         playerInput.actions["Attack"].canceled += OnAttackCanceled;
-        playerInput.actions["Attack"].started += OnAttackStarted;
+        playerInput.actions["Attack"].started += OnAttackStarted;     
 
         moveAbility = GetComponent<MoveAbility>();
         jumpAbility = GetComponent<JumpAbility>();
@@ -33,10 +38,13 @@ public class Player : MonoBehaviour
         dashAbility = GetComponent<DashAbility>();
         activeWeapon = GetComponent<ActiveWeapon>();
         attackAbility = GetComponent<AttackAbility>();
-        parryAbility = GetComponent<ParryAbility>();
+
+        look.SetActive(false);
+
+        circleTimer.timerEnded += TimerEnd;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         Vector2 deltaMouse = Mouse.current.delta.ReadValue();
 
@@ -47,16 +55,23 @@ public class Player : MonoBehaviour
             look.transform.eulerAngles = new Vector3(0, 0, newZ);
         }
 
-        if (isAttacking)
+        if (isDashing)
         {
-            attackTime += Time.fixedDeltaTime;
-            if (attackTime > 0.05f)
+            time += Time.deltaTime;
+            if (!hasSlowing)
+            {
+                SlowTimeStart();
+            }
+        }
+        else if (isAttacking)
+        {
+            time += Time.deltaTime;
+            if (time > 0.1f)
             {
                 activeWeapon.SetWeaponDirection(lookDirection);
                 if (!hasSlowing)
                 {
-                    timeSlowAbility.IsActive = true;
-                    hasSlowing = true;
+                    SlowTimeStart();
                 }
             }
         }
@@ -72,31 +87,56 @@ public class Player : MonoBehaviour
         jumpAbility.Jump();
     }
 
-    private void OnDash()
+    private void OnDashStarted(InputAction.CallbackContext context)
     {
+        if (isAttacking) return;
+
+        isDashing = true;
+    }
+
+    private void OnDashCanceled(InputAction.CallbackContext context)
+    {
+        if (!isDashing) return;
+
         dashAbility.Dash(lookDirection);
+        circleTimer.StopTimer();
     }
 
     private void OnAttackStarted(InputAction.CallbackContext context)
     {
+        if (isDashing) return;
+
         isAttacking = true;
-        Vector2 mousePosition = Mouse.current.position.ReadValue();
-        if (mousePosition.x >= Screen.width / 2)
-        {
-            activeWeapon.SetWeaponDirection(new Vector2(1, 0));
-        }
-        else
-        {
-            activeWeapon.SetWeaponDirection(new Vector2(-1, 0));
-        }
+        activeWeapon.SetWeaponDirection(new Vector2(lookDirection.x, 0).normalized);
     }
 
     private void OnAttackCanceled(InputAction.CallbackContext context)
     {
+        if (!isAttacking) return;
+
         attackAbility.Attack(activeWeapon.Weapon);
-        isAttacking = false;
-        attackTime = 0.0f;
-        hasSlowing = false;
-        timeSlowAbility.IsActive = false;
+        circleTimer.StopTimer();   
     }
+
+    private void SlowTimeStart()
+    {
+        timeSlowAbility.IsActive = true;
+        hasSlowing = true;
+
+        look.SetActive(true);
+        circleTimer.StartTimer(timeOfAiming);
+    }
+
+    private void TimerEnd(object o, EventArgs e)
+    {
+        look.SetActive(false);
+
+        timeSlowAbility.IsActive = false;
+        hasSlowing = false;
+        time = 0.0f;
+
+        if (isAttacking) isAttacking = false;
+        else if (isDashing) isDashing = false;
+    }
+
 }

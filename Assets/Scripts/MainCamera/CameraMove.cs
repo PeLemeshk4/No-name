@@ -3,10 +3,13 @@ using UnityEngine;
 public class CameraMove : MonoBehaviour
 {
     [SerializeField] private float speed = 3.0f;
+    [SerializeField] private Transform player;
 
-    private void FixedUpdate()
+    private void Update()
     {
-        Vector3 direction = new Vector3(speed * Time.fixedDeltaTime, 0, 0);
-        transform.position += direction;
+        if (player.position.x > transform.position.x + 3 || player.position.x < transform.position.x - 3)
+        {
+            transform.position += new Vector3(player.position.x - transform.position.x, 0, 0) * Time.deltaTime;
+        }
     }
 }

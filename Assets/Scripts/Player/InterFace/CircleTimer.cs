@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class CircleTimer : MonoBehaviour
@@ -8,6 +10,8 @@ public class CircleTimer : MonoBehaviour
     private float totalTime;
     private float currentTime;
     private bool isRunning = false;
+
+    public event EventHandler<EventArgs> timerEnded;
 
 
     private void Awake()
@@ -22,7 +26,7 @@ public class CircleTimer : MonoBehaviour
     {
         if (!isRunning) return;
 
-        currentTime -= Time.deltaTime;
+        currentTime -= Time.deltaTime / Time.timeScale;
         UpdateVisual();
 
         if (currentTime <= 0)
@@ -50,5 +54,7 @@ public class CircleTimer : MonoBehaviour
     {
         gameObject.SetActive(false);
         isRunning = false;
+
+        timerEnded?.Invoke(this, new EventArgs());
     }
 }

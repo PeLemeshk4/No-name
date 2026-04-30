@@ -36,6 +36,8 @@ public class ActiveWeapon : MonoBehaviour
 
     public void SetWeaponDirection(Vector2 direction)
     {
+        if (weapon.IsAttacking) return;
+
         float weaponAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90.0f;
         weaponObject.transform.eulerAngles = new Vector3(0, 0, weaponAngle);
     }
