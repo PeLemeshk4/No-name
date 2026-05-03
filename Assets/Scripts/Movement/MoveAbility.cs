@@ -7,6 +7,14 @@ public class MoveAbility : MonoBehaviour
 
     private float direction = 0.0f;
 
+    public float Speed
+    {
+        get
+        {
+            return speed;
+        }
+    }
+
     public float Direction 
     {
         get
@@ -26,6 +34,6 @@ public class MoveAbility : MonoBehaviour
 
     private void FixedUpdate()
     {
-        movementSystem.Move = direction * speed * Time.fixedDeltaTime;
+        movementSystem.Move = direction * speed;
     }
 }

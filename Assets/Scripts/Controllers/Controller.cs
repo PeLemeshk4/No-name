@@ -2,6 +2,7 @@ using UnityEngine;
 
 public abstract class Controller : MonoBehaviour 
 {
+    [SerializeField] protected bool isEndless = false;
     [SerializeField] protected float maxValue;
 
     public float MaxValue { get { return maxValue; } }

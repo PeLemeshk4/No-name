@@ -4,15 +4,23 @@ using UnityEngine.InputSystem;
 public class DashAbility : MonoBehaviour
 {
     [SerializeField] private MovementSystem movementSystem;
-    [SerializeField] private float length = 300.0f;
-    [SerializeField] private float speed = 1.0f;
+    [SerializeField] private float length = 6.0f;
+    [SerializeField] private float speed = 5.0f;
     [SerializeField] private float cost = 50.0f;
-    [SerializeField] private float powerOfBounce = 1.0f;
+    [SerializeField] private float powerOfBounce = 0.9f;
     [SerializeField] private StaminaController staminaController;
 
     private bool isDash = false;
     private Vector2 dashDirection;
     private float time = 0.0f;
+
+    public float Length
+    {
+        get
+        {
+            return length;
+        }
+    }
 
     private void Awake()
     {
@@ -25,7 +33,7 @@ public class DashAbility : MonoBehaviour
     {
         if (isDash)
         {
-            movementSystem.Dash = dashDirection * Time.fixedDeltaTime;
+            movementSystem.Dash = dashDirection * speed;
             time += Time.fixedDeltaTime;
             if (time > length / speed)
             {
@@ -53,7 +61,7 @@ public class DashAbility : MonoBehaviour
     {
         if (staminaController.TryConsume(cost))
         {
-            dashDirection = direction * speed;
+            dashDirection = direction;
             isDash = true;
             time = 0.0f;
         }

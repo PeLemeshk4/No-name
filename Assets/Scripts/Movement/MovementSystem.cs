@@ -89,14 +89,14 @@ public class MovementSystem : MonoBehaviour
     public void Jump(float power)
     {
         if (!isDash)
-        {
-            rb.AddForceY(power);
+        { 
+            rb.AddForceY(power, ForceMode2D.Impulse);
         }
     }
 
     public void Bounce(float power, Vector2 direction)
     {
         isBounce = true;
-        rb.AddForce(direction * power);
+        rb.AddForce(direction * power, ForceMode2D.Impulse);
     }
 }

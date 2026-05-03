@@ -6,6 +6,8 @@ public class HealthController : Controller
 {
     public override bool TryConsume(float amount)
     {
+        if (isEndless) return true;
+
         value -= amount;
         if (value <= 0)
         {

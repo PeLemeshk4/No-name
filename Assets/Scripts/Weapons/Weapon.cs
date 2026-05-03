@@ -63,17 +63,19 @@ public class Weapon : MonoBehaviour
         {
             attackTime += Time.deltaTime;
 
-            if (hasAttacked || attackTime >= WeaponData.AttackDuration)
+            if (attackTime >= WeaponData.AttackDuration)
             {
                 attack.enabled = false;
-                
-                if (attackTime >= WeaponData.AttackDuration)
-                {
-                    isAttacking = false;
-                    attackTime = 0.0f;
+                isAttacking = false;
+                attackTime = 0.0f;
 
-                    animator.SetBool("IsAttacking", isAttacking);
-                }
+                animator.SetBool("IsAttacking", isAttacking);
+
+                return;
+            }
+            else if (hasAttacked)
+            {
+                attack.enabled = false;
 
                 return;
             }
@@ -84,7 +86,7 @@ public class Weapon : MonoBehaviour
             }
             else if (attackTime >= attackStages.x)
             {
-                attack.enabled = true; 
+                attack.enabled = true;
             }
         }
     }

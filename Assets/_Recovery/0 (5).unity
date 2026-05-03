@@ -519,7 +519,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aba466b91dad0af42a710e383901424d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraMove
-  speed: 1
+  speed: 3
   player: {fileID: 931150977}
 --- !u!1 &489873261
 GameObject:
@@ -1611,7 +1611,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75d82bb5c1bdbbe4aa27ed16cb94f904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaminaController
-  isEndless: 1
+  isEndless: 0
   maxValue: 100
   regenRate: 10
 --- !u!114 &931150979

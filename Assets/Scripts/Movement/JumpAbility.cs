@@ -3,9 +3,17 @@ using UnityEngine;
 public class JumpAbility : MonoBehaviour
 {
     [SerializeField] private MovementSystem movementSystem;
-    [SerializeField] private float power = 300.0f;
+    [SerializeField] private float power = 8.0f;
 
     private bool onGround = false;
+
+    public float Power
+    {
+        get
+        {
+            return power;
+        }
+    }
 
     private void Awake()
     {

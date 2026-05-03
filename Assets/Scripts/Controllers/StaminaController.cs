@@ -30,6 +30,8 @@ public class StaminaController : Controller
 
     public override bool TryConsume(float amount)
     {
+        if (isEndless) return true;
+
         isRegenActive = false;
         if (value <= amount) return false;
         value -= amount;
