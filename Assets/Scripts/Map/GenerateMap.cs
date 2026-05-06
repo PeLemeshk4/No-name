@@ -16,11 +16,12 @@ public class GenerateMap : MonoBehaviour
     [SerializeField] private Tile tile;
     [SerializeField] private GameObject player;
     [SerializeField] private Camera cam;
+    [SerializeField] private float maxPercentOffset = 50;
 
-    private List<Vector2Int> points = new List<Vector2Int>() { new Vector2Int(0, 0) };
+    private List<Vector2Int> downFloor = new List<Vector2Int>() { new Vector2Int(0, 0) };
+    private List<Vector2Int> upperFloor = new List<Vector2Int>() { new Vector2Int(0, 0) };
     private int safePlatformLength = 20;
-    private float yMax = 5;
-
+    private float maxOffset;
 
     struct PlayerParameters
     {
@@ -36,6 +37,8 @@ public class GenerateMap : MonoBehaviour
 
     private void Awake()
     {
+        transform.position = new Vector3(-cam.orthographicSize * Screen.width / Screen.height, -cam.orthographicSize - 1, 0);
+
         parameters.g = player.GetComponent<Rigidbody2D>().gravityScale * Physics2D.gravity.y;
         parameters.m = player.GetComponent<Rigidbody2D>().mass;
         parameters.jumpPower = player.GetComponent<JumpAbility>().Power;
@@ -44,23 +47,24 @@ public class GenerateMap : MonoBehaviour
             + (parameters.g * (parameters.jumpTime * parameters.jumpTime)) / 2;
         parameters.speed = player.GetComponent<MoveAbility>().Speed;
         parameters.dashLength = player.GetComponent<DashAbility>().Length;
-        yMax = cam.orthographicSize * 2 - 1;
+        maxOffset = (int)(cam.orthographicSize * maxPercentOffset / 100.0f);
 
-        AddSafePlatform();
+        AddSafePlatform(downFloor);
         for (int i = 0; i < 10; i++)
         {
-            AddRandomPlatform();
+            AddRandomPlatform(downFloor);
         }
+        BuildPlatforms(downFloor);
 
-        BuildMap();
+        AddSafePlatform(upperFloor);
+        for (int i = 0; i < 10; i++)
+        {
+            AddRandomPlatform(upperFloor);
+        }
+        BuildPlatforms(upperFloor, true);
     }
 
-    private void Generate()
-    {
-
-    }
-
-    private void AddRandomPlatform()
+    private void AddRandomPlatform(List<Vector2Int> points)
     {
         int last = points.Count - 1;
         Vector2Int point = GetRandomPossibilityPoint(points[last]);
@@ -72,27 +76,39 @@ public class GenerateMap : MonoBehaviour
     private Vector2Int GetRandomPossibilityPoint(Vector2Int previosPoint)
     {
         float yPossibility = parameters.jumpHeight + parameters.dashLength;
-        float maxDY = Mathf.Min(yPossibility, yMax - previosPoint.y);
+        float maxDY = Mathf.Min(yPossibility, maxOffset - previosPoint.y);
         int dy = (int)Random.Range(-previosPoint.y, maxDY);
-        float maxDX = Mathf.Sqrt((dy - parameters.jumpHeight - parameters.dashLength) * 
+        float maxDX;
+        if (dy > parameters.jumpHeight)
+        {
+            maxDX = Mathf.Sqrt((dy - parameters.jumpHeight - parameters.dashLength) *
             2 * (parameters.speed * parameters.speed) / parameters.g) + (parameters.speed * parameters.jumpTime);
-        int dx = (int)Random.Range(0, maxDX);
+        }
+        else
+        {
+            maxDX = Mathf.Sqrt((dy - parameters.jumpHeight) *
+            2 * (parameters.speed * parameters.speed) / parameters.g) + (parameters.speed * parameters.jumpTime) + parameters.dashLength;
+        }
+
+            int dx = (int)maxDX; // (int)Random.Range(0, maxDX);
+        Debug.Log(new Vector2(dx, dy));
 
         return new Vector2Int(previosPoint.x + dx, previosPoint.y + dy);
     }
 
-    private void AddSafePlatform()
+    private void AddSafePlatform(List<Vector2Int> points)
     {
         int last = points.Count - 1;
         Vector2Int nextPoint = new Vector2Int(points[last].x + safePlatformLength, points[last].y);
         points.Add(nextPoint);
     }
 
-    private void BuildMap()
+    private void BuildPlatforms(List<Vector2Int> points, bool reverse = false)
     {
-        Vector2Int previosPoint = points[0];
-
-        for (int i = 1; i < points.Count; i++)
+        int i = 0;
+        Vector2Int previosPoint = points[i];
+ 
+        for (i = 1; i < points.Count; i++)
         {
             if (previosPoint.y != points[i].y)
             {
@@ -105,11 +121,13 @@ public class GenerateMap : MonoBehaviour
             {
                 for (int y1 = y; y1 >= 0; y1--)
                 {
-                    Vector3Int position = new Vector3Int(x, y1, 0);
+                    Vector3Int position = new Vector3Int(x, reverse ? (int)(cam.orthographicSize * 2) - y1 : y1, 0);
                     
                     tilemap.SetTile(position, tile);
                 }      
             }
+
+
         }
     }
 

@@ -23,7 +23,6 @@ public class ActiveWeapon : MonoBehaviour
 
     private async void Awake()
     {
-
         weaponObject = await AssetLoader.ClonePrefabAsync(PrefabPaths.WeaponPrefab, transform);
         weaponObject.name = "Weapon";
         weapon = weaponObject.GetComponent<Weapon>();

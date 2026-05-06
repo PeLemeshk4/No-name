@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6578318215648847786}
   - component: {fileID: 4461783958639593483}
   - component: {fileID: -9166541129652993662}
-  - component: {fileID: 1395353935252093292}
   - component: {fileID: 7377938575240121460}
   m_Layer: 0
   m_Name: Weapon
@@ -107,18 +106,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
   animator: {fileID: 0}
---- !u!114 &1395353935252093292
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8435928114246105755}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59d96ab6b3765a24eb1aac899f5c4211, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ParryZone
 --- !u!95 &7377938575240121460
 Animator:
   serializedVersion: 7
