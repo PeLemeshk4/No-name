@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - Attack
+  - HealthBar
+  - StaminaBar
+  - Map
   layers:
   - Default
   - TransparentFX

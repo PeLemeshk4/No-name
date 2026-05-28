@@ -3,12 +3,9 @@ using UnityEngine.InputSystem;
 
 public class DashAbility : MonoBehaviour
 {
-    [SerializeField] private MovementSystem movementSystem;
-    [SerializeField] private float length = 6.0f;
-    [SerializeField] private float speed = 5.0f;
-    [SerializeField] private float cost = 50.0f;
-    [SerializeField] private float powerOfBounce = 0.9f;
-    [SerializeField] private StaminaController staminaController;
+    private MovementSystem movementSystem;
+    private TagDash tagDash;
+    private StaminaController staminaController;
 
     private bool isDash = false;
     private Vector2 dashDirection;
@@ -18,24 +15,31 @@ public class DashAbility : MonoBehaviour
     {
         get
         {
-            return length;
+            return tagDash.Length;
         }
     }
 
     private void Awake()
     {
+        enabled = false;
+    }
+    public void Init(TagDash tagDash, StaminaController staminaController)
+    {
+        this.tagDash = tagDash;
+        this.staminaController = staminaController;
+
         movementSystem = GetComponent<MovementSystem>();
 
-        staminaController = GetComponent<StaminaController>();
+        enabled = true;
     }
     
     private void FixedUpdate()
     {
         if (isDash)
         {
-            movementSystem.Dash = dashDirection * speed;
+            movementSystem.Dash = dashDirection * tagDash.Speed;
             time += Time.fixedDeltaTime;
-            if (time > length / speed)
+            if (time > tagDash.Length / tagDash.Speed)
             {
                 movementSystem.Dash = Vector2.zero;
                 isDash = false;
@@ -53,13 +57,13 @@ public class DashAbility : MonoBehaviour
             movementSystem.Dash = Vector2.zero;
             Vector2 normal = collision.contacts[0].normal;
             Vector2 directionBounce = dashDirection - 2.0f * Vector2.Dot(dashDirection, normal) * normal;
-            movementSystem.Bounce(speed * powerOfBounce, directionBounce.normalized);
+            movementSystem.Bounce(tagDash.Speed * tagDash.PowerOfBounce, directionBounce.normalized);
         }
     }
 
     public void Dash(Vector2 direction)
     {
-        if (staminaController.TryConsume(cost))
+        if (staminaController.TryConsume(tagDash.Cost))
         {
             dashDirection = direction;
             isDash = true;

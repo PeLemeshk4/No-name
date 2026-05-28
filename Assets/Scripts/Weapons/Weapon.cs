@@ -1,13 +1,9 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using UnityEditor.Compilation;
+using System;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 public class Weapon : MonoBehaviour
 {
-    [SerializeField] private Animator animator;
-    private WeaponData weaponData;
+    private TagWeaponStats weaponStats;
     private BoxCollider2D attackCollider;
     private Attack attack;
     private Vector3 attackStages;
@@ -15,24 +11,31 @@ public class Weapon : MonoBehaviour
     private float attackTime = 0.0f;
     private bool hasAttacked = false;
 
+    public event EventHandler<ValueChangedEventArgs<bool>> AttackingChanged;
+
     public bool IsAttacking
     {
         get
         {
             return isAttacking;
         }
+        private set
+        {
+            isAttacking = value;
+            AttackingChanged?.Invoke(this, new ValueChangedEventArgs<bool>(isAttacking));
+        }
     }
 
-    public WeaponData WeaponData
+    public TagWeaponStats WeaponStats
     {
         get
         {
-            return weaponData;
+            return weaponStats;
         }
         set
         {
-            weaponData = value;
-            if (weaponData == null)
+            weaponStats = value;
+            if (weaponStats == null)
             {
                 gameObject.SetActive(false);
                 return;
@@ -44,17 +47,24 @@ public class Weapon : MonoBehaviour
 
     private void Awake()
     {
-        gameObject.SetActive(false);
+        enabled = false;
+    }
+    public void Init(TagWeaponStats tagWeaponStats, BoxCollider2D boxCollider)
+    {
+        weaponStats = tagWeaponStats;
+        attackCollider = boxCollider;
 
-        animator = GetComponent<Animator>();
-
-        attackCollider = gameObject.AddComponent<BoxCollider2D>();
         attackCollider.size = Vector2.zero;
         attackCollider.isTrigger = true;
 
         attack = gameObject.AddComponent<Attack>();
+        attack.Init(attackCollider);
         attack.enabled = false;
         attack.AttackHit += OnAttackHit;
+
+        UpdateWeapon();
+
+        enabled = true;
     }
 
     private void Update()
@@ -63,19 +73,10 @@ public class Weapon : MonoBehaviour
         {
             attackTime += Time.deltaTime;
 
-            if (attackTime >= WeaponData.AttackDuration)
+            if (attackTime >= weaponStats.AttackDuration)
             {
                 attack.enabled = false;
-                isAttacking = false;
-                attackTime = 0.0f;
-
-                animator.SetBool("IsAttacking", isAttacking);
-
-                return;
-            }
-            else if (hasAttacked)
-            {
-                attack.enabled = false;
+                IsAttacking = false;
 
                 return;
             }
@@ -84,7 +85,7 @@ public class Weapon : MonoBehaviour
             {
                 attack.enabled = false;
             }
-            else if (attackTime >= attackStages.x)
+            else if (attackTime >= attackStages.x && !hasAttacked)
             {
                 attack.enabled = true;
             }
@@ -93,40 +94,30 @@ public class Weapon : MonoBehaviour
 
     private void UpdateWeapon()
     {
-        attack.Damage = weaponData.Damage;
-        attackCollider.size = new Vector2(weaponData.Width, weaponData.Length);
-        attackCollider.offset = new Vector2(0, weaponData.Length / 2);
-        attackStages = weaponData.AttackStages;
+        attack.Damage = weaponStats.Damage;
+        attackStages = weaponStats.AttackStages;
+        attackCollider.size = new Vector2(weaponStats.Width, weaponStats.Length);
+        attackCollider.offset = new Vector2(0, weaponStats.Length / 2);
     }
 
     private void OnAttackHit(object sender, AttackHitEventsArgs e)
     {
-        attack.enabled = false;
-        if (e.Attacks != null)
-        {
-            List<Attack> attacks = e.Attacks;
-            for(int i = attacks.Count - 1; i >= 0; i--)
-            {
-                if (attacks[i] == null) continue;
-                attacks[i].gameObject.SetActive(false);
-            }
-            Debug.Log("Parry");
-        }
-        else
-        {
-            Debug.Log("Attack");
-        }
+        attack.enabled = false;      
         hasAttacked = true;
     }
 
-    public void Attack()
+    public bool Attack(Vector2 direction)
     {
-        if (weaponData == null) return;
-        if (isAttacking) return;
+        if (weaponStats == null) return false;
+        if (isAttacking) return false;
+
+        float newZ = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90.0f;
+        transform.eulerAngles = new Vector3(0, 0, newZ);
 
         hasAttacked = false;
-        isAttacking = true;
+        IsAttacking = true;
+        attackTime = 0.0f;
 
-        animator.SetBool("IsAttacking", isAttacking);
+        return true;
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 public class TimeSlowAbility : MonoBehaviour
 {
-    [SerializeField] private float factor = 0.3f;
+    private TagTimeSlow tagTimeSlow;
     
     private bool isActive = false;
 
@@ -24,8 +24,19 @@ public class TimeSlowAbility : MonoBehaviour
             }
             else
             {
-                Time.timeScale = factor;
+                Time.timeScale = tagTimeSlow.factor;
             }
         }
+    }
+
+    private void Awake()
+    {
+        enabled = false;
+    }
+    public void Init(TagTimeSlow tagTimeSlow)
+    {
+        this.tagTimeSlow = tagTimeSlow;
+
+        enabled = true;
     }
 }

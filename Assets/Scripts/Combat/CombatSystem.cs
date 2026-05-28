@@ -9,12 +9,11 @@ public class CombatSystem : MonoBehaviour
         TryGetComponent<MovementSystem>(out movementSystem);
     }
 
-    public bool TryAttack(Weapon weapon)
+    public bool TryAttack(Weapon weapon, Vector2 direction)
     {
         if (movementSystem != null && movementSystem.IsDash) return false;
         if (weapon == null) return false;
 
-        weapon.Attack();
-        return true;
+        return weapon.Attack(direction);
     }
 }

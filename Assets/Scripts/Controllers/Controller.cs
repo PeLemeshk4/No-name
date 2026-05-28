@@ -2,18 +2,14 @@ using UnityEngine;
 
 public abstract class Controller : MonoBehaviour 
 {
-    [SerializeField] protected bool isEndless = false;
-    [SerializeField] protected float maxValue;
-
-    public float MaxValue { get { return maxValue; } }
-
     protected float value;
 
     public float Value { get { return value; } }
+    public abstract float MaxValue { get; }
 
     private void Awake()
     {
-        value = maxValue;
+        enabled = false;
     }
 
     public abstract bool TryConsume(float amount);

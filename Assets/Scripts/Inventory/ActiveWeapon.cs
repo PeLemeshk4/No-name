@@ -21,23 +21,26 @@ public class ActiveWeapon : MonoBehaviour
         }
     }
 
-    private async void Awake()
+    private void Awake()
     {
-        weaponObject = await AssetLoader.ClonePrefabAsync(PrefabPaths.WeaponPrefab, transform);
-        weaponObject.name = "Weapon";
+        enabled = false;
+    }
+    public void Init(CMSEntity weaponModel)
+    {
+        GameObject weaponObject = Factory.Create(Resources.Load<GameObject>("CMS/Prefabs/GameObjects/Weapon"), weaponModel);
         weapon = weaponObject.GetComponent<Weapon>();
+        weaponObject.transform.parent = transform;
+        weaponObject.transform.localPosition = Vector3.zero;
+
+        enabled = true;
     }
 
-    public void SetWeapon(WeaponData weaponData)
+    public bool SetWeapon(CMSEntity weaponModel)
     {
-        weapon.WeaponData = weaponData;
-    }
+        TagWeaponStats stats = weaponModel.Get<TagWeaponStats>();
+        if (stats == null) return false;
 
-    public void SetWeaponDirection(Vector2 direction)
-    {
-        if (weapon.IsAttacking) return;
-
-        float weaponAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90.0f;
-        weaponObject.transform.eulerAngles = new Vector3(0, 0, weaponAngle);
+        weapon.WeaponStats = stats;
+        return true;
     }
 }

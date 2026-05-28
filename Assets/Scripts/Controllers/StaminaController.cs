@@ -2,23 +2,33 @@ using UnityEngine;
 
 public class StaminaController : Controller
 {
-    [SerializeField] private float regenRate = 10.0f;
+    private TagStamina tagStamina;
 
     private bool isRegenActive = true;
+
+    public override float MaxValue { get { return tagStamina.MaxValue; } }
+
+    public void Init(TagStamina tagStamina)
+    {
+        this.tagStamina = tagStamina;
+        value = tagStamina.MaxValue;
+
+        enabled = true;
+    }
 
     private void FixedUpdate()
     {
         if (isRegenActive)
         {
-            if (value < maxValue)
+            if (value < tagStamina.MaxValue)
             {
-                if (value + regenRate * Time.fixedDeltaTime <= maxValue)
+                if (value + tagStamina.RegenRate * Time.fixedDeltaTime <= tagStamina.MaxValue)
                 {
-                    value += regenRate * Time.fixedDeltaTime;
+                    value += tagStamina.RegenRate * Time.fixedDeltaTime;
                 }
                 else
                 {
-                    value = maxValue;
+                    value = tagStamina.MaxValue;
                 }
             }            
         }
@@ -30,7 +40,7 @@ public class StaminaController : Controller
 
     public override bool TryConsume(float amount)
     {
-        if (isEndless) return true;
+        if (tagStamina.IsEndless) return true;
 
         isRegenActive = false;
         if (value <= amount) return false;

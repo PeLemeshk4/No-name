@@ -1,36 +1,43 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
-using static UnityEngine.Rendering.DebugUI;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private MoveAbility moveAbility;
-    [SerializeField] private JumpAbility jumpAbility;
-    [SerializeField] private TimeSlowAbility timeSlowAbility;
-    [SerializeField] private DashAbility dashAbility;
-    [SerializeField] private ActiveWeapon activeWeapon;
-    [SerializeField] private AttackAbility attackAbility;
+    private MoveAbility moveAbility;
+    private JumpAbility jumpAbility;
+    private TimeSlowAbility timeSlowAbility;
+    private DashAbility dashAbility;
+    private ActiveWeapon activeWeapon;
+    private AttackAbility attackAbility;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
 
+    [SerializeField] private Rigidbody2D rb;
     [SerializeField] private CircleTimer circleTimer;
     [SerializeField] private GameObject look;
     [SerializeField] private float timeOfAiming = 2.0f;
 
-    private PlayerInput playerInput;
+    [SerializeField] private PlayerInput playerInput;
+    private float moveDirection = 0;
     private Vector2 lookDirection = Vector2.zero;
     private bool isAttacking = false;
     private bool isDashing = false;
     private float time = 0.0f;
     private bool hasSlowing = false;
 
+    // Сделать поведение, чтобы класс не хранил ссылки на классы, а только использовал их
     private void Awake()
-    {   
+    {
+        enabled = false;
+    }
+    public void Init()
+    {
         playerInput = GetComponent<PlayerInput>();
         playerInput.actions["Dash"].started += OnDashStarted;
         playerInput.actions["Dash"].canceled += OnDashCanceled;
         playerInput.actions["Attack"].canceled += OnAttackCanceled;
-        playerInput.actions["Attack"].started += OnAttackStarted;     
+        playerInput.actions["Attack"].started += OnAttackStarted;
 
         moveAbility = GetComponent<MoveAbility>();
         jumpAbility = GetComponent<JumpAbility>();
@@ -38,26 +45,23 @@ public class Player : MonoBehaviour
         dashAbility = GetComponent<DashAbility>();
         activeWeapon = GetComponent<ActiveWeapon>();
         attackAbility = GetComponent<AttackAbility>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>();
 
+        //
         look.SetActive(false);
 
         circleTimer.timerEnded += TimerEnd;
+
+        enabled = true;
     }
 
     private void Update()
     {
-        Vector2 deltaMouse = Mouse.current.delta.ReadValue();
-
-        if (!(deltaMouse == Vector2.zero || deltaMouse.magnitude <= 5.0f))
-        {
-            lookDirection = deltaMouse.normalized;
-            float newZ = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg - 90.0f;
-            look.transform.eulerAngles = new Vector3(0, 0, newZ);
-        }
-
         if (isDashing)
         {
-            time += Time.deltaTime;
+            SetLookDirection();
             if (!hasSlowing)
             {
                 SlowTimeStart();
@@ -68,18 +72,83 @@ public class Player : MonoBehaviour
             time += Time.deltaTime;
             if (time > 0.1f)
             {
-                activeWeapon.SetWeaponDirection(lookDirection);
+                SetLookDirection();
                 if (!hasSlowing)
                 {
                     SlowTimeStart();
                 }
             }
+            else
+            {
+                lookDirection = new Vector2(lookDirection.x, 0).normalized;
+            }
+        }
+        else
+        {
+            SetLookDirection();
+        }
+
+        if (!activeWeapon.Weapon.IsAttacking)
+        {
+            spriteRenderer.flipX = lookDirection.x < 0 ? true : false;
+        }
+
+        if (activeWeapon.Weapon.IsAttacking)
+        {
+            moveAbility.Direction = 0;
+            animator.SetBool("Attacking", true);
+            animator.SetBool("Running", false);
+            animator.SetBool("Fall", false);
+            animator.SetBool("Jump", false);
+        }
+        else if (Mathf.Abs(rb.linearVelocityY) > 0.1f)
+        {
+            moveAbility.Direction = moveDirection;
+            animator.SetBool("Attacking", false);
+            animator.SetBool("Running", false);
+            if (rb.linearVelocityY > 0)
+            {
+                animator.SetBool("Fall", false);
+                animator.SetBool("Jump", true);
+            }
+            else
+            {
+                animator.SetBool("Jump", false);
+                animator.SetBool("Fall", true);
+            }
+        }
+        else
+        {
+            moveAbility.Direction = moveDirection;
+            animator.SetBool("Fall", false);
+            animator.SetBool("Jump", false);
+            animator.SetBool("Attacking", false);
+
+            if (moveAbility.Direction != 0)
+            {
+                animator.SetBool("Running", true);
+            }
+            else
+            {
+                animator.SetBool("Running", false);
+            }
+        }    
+    }
+
+    private void SetLookDirection()
+    {
+        Vector2 deltaMouse = Mouse.current.delta.ReadValue();
+        if (!(deltaMouse == Vector2.zero || deltaMouse.magnitude <= 5.0f))
+        {
+            lookDirection = deltaMouse.normalized;
+            float newZ = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg - 90.0f;
+            look.transform.eulerAngles = new Vector3(0, 0, newZ);
         }
     }
 
     private void OnMove(InputValue value)
     {
-        moveAbility.Direction = value.Get<float>();
+        moveDirection = value.Get<float>();
     }
 
     private void OnJump()
@@ -106,16 +175,17 @@ public class Player : MonoBehaviour
     {
         if (isDashing) return;
 
-        isAttacking = true;
-        activeWeapon.SetWeaponDirection(new Vector2(lookDirection.x, 0).normalized);
+        lookDirection = new Vector2(lookDirection.x, 0).normalized;
+        isAttacking = true;    
     }
 
     private void OnAttackCanceled(InputAction.CallbackContext context)
     {
         if (!isAttacking) return;
 
-        attackAbility.Attack(activeWeapon.Weapon);
-        circleTimer.StopTimer();   
+        moveAbility.Direction = 0;
+        attackAbility.Attack(activeWeapon.Weapon, lookDirection);
+        circleTimer.StopTimer();
     }
 
     private void SlowTimeStart()

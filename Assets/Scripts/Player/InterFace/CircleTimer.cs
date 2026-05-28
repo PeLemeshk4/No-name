@@ -16,10 +16,18 @@ public class CircleTimer : MonoBehaviour
 
     private void Awake()
     {
+        enabled = false;
+    }
+    public void Init()
+    {
         timerImage = GetComponent<Image>();
         timerImage.type = Image.Type.Filled;
         timerImage.fillMethod = Image.FillMethod.Radial360;
         timerImage.fillOrigin = (int)Image.Origin360.Top;
+
+        gameObject.SetActive(false);
+
+        enabled = true;
     }
 
     private void Update()

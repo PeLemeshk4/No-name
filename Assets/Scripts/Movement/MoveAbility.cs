@@ -1,9 +1,10 @@
+using System;
 using UnityEngine;
 
 public class MoveAbility : MonoBehaviour
 {
-    [SerializeField] private MovementSystem movementSystem;
-    [SerializeField] private float speed = 5.0f;
+    private MovementSystem movementSystem;
+    private TagSpeed tagSpeed;
 
     private float direction = 0.0f;
 
@@ -11,7 +12,7 @@ public class MoveAbility : MonoBehaviour
     {
         get
         {
-            return speed;
+            return tagSpeed.Speed;
         }
     }
 
@@ -29,11 +30,19 @@ public class MoveAbility : MonoBehaviour
 
     private void Awake()
     {
+        enabled = false;
+    }
+    public void Init(TagSpeed tagSpeed)
+    {
+        this.tagSpeed = tagSpeed;
+
         movementSystem = GetComponent<MovementSystem>();
+
+        enabled = true;
     }
 
     private void FixedUpdate()
     {
-        movementSystem.Move = direction * speed;
+        movementSystem.Move = direction * tagSpeed.Speed;
     }
 }

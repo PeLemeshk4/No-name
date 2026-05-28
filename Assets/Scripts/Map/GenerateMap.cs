@@ -1,19 +1,11 @@
-using NUnit.Framework;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Drawing;
-using System.Security.Cryptography;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using static GenerateMap;
-using static UnityEngine.Audio.GeneratorInstance;
 
 public class GenerateMap : MonoBehaviour
 {
     [SerializeField] private Tilemap tilemap;
-    [SerializeField] private Tile tile;
+    [SerializeField] private RuleTile tile;
     [SerializeField] private GameObject player;
     [SerializeField] private Camera cam;
     [SerializeField] private float maxPercentOffset = 50;
@@ -35,7 +27,7 @@ public class GenerateMap : MonoBehaviour
     }
     PlayerParameters parameters = new PlayerParameters();
 
-    private void Awake()
+    public void Init(GameObject player)
     {
         transform.position = new Vector3(-cam.orthographicSize * Screen.width / Screen.height, -cam.orthographicSize - 1, 0);
 
@@ -47,8 +39,11 @@ public class GenerateMap : MonoBehaviour
             + (parameters.g * (parameters.jumpTime * parameters.jumpTime)) / 2;
         parameters.speed = player.GetComponent<MoveAbility>().Speed;
         parameters.dashLength = player.GetComponent<DashAbility>().Length;
-        maxOffset = (int)(cam.orthographicSize * maxPercentOffset / 100.0f);
+        maxOffset = (int)(cam.orthographicSize * maxPercentOffset / 100.0f);  
+    }
 
+    public void Generate()
+    {
         AddSafePlatform(downFloor);
         for (int i = 0; i < 10; i++)
         {
@@ -62,6 +57,23 @@ public class GenerateMap : MonoBehaviour
             AddRandomPlatform(upperFloor);
         }
         BuildPlatforms(upperFloor, true);
+    }
+
+    public void AddEnemy(GameObject enemyPfb, CMSEntity enemyModel, float chanceOnPlatform)
+    {
+        for (int i = 0; i < downFloor.Count - 1; i++)
+        {
+            if (downFloor[i][1] == downFloor[i + 1][1])
+            {
+                float r = Random.Range(0, 100);
+                if (r <= chanceOnPlatform)
+                {
+                    GameObject enemy = Factory.Create(enemyPfb, enemyModel);
+                    enemy.transform.parent = gameObject.transform;
+                    enemy.transform.localPosition = new Vector3(Random.Range(downFloor[i][0], downFloor[i+1][0]), downFloor[i][1] + 3, 0);
+                }
+            }
+        }
     }
 
     private void AddRandomPlatform(List<Vector2Int> points)
@@ -90,8 +102,7 @@ public class GenerateMap : MonoBehaviour
             2 * (parameters.speed * parameters.speed) / parameters.g) + (parameters.speed * parameters.jumpTime) + parameters.dashLength;
         }
 
-            int dx = (int)maxDX; // (int)Random.Range(0, maxDX);
-        Debug.Log(new Vector2(dx, dy));
+        int dx = (int)Random.Range(0, maxDX);
 
         return new Vector2Int(previosPoint.x + dx, previosPoint.y + dy);
     }

@@ -1,24 +1,33 @@
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using static UnityEngine.Rendering.DebugUI;
 
 public class HealthController : Controller
 {
+    private TagHealth tagHealth;
+
+    public override float MaxValue { get { return tagHealth.MaxHealth; } }
+
+    public EventHandler<EventArgs> HealthIsNull;
+
+    public void Init(TagHealth tagHealth)
+    {
+        this.tagHealth = tagHealth;
+        value = tagHealth.MaxHealth;
+
+        enabled = true;
+    }
+
     public override bool TryConsume(float amount)
     {
-        if (isEndless) return true;
+        if (tagHealth.IsEndless) return true;
 
         value -= amount;
         if (value <= 0)
         {
-            if (gameObject.tag == "Player")
-            {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            HealthIsNull.Invoke(this, new EventArgs());
         }
         return true;
     }

@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,13 +10,22 @@ public class SliderOfController : MonoBehaviour
 
     private void Awake()
     {
+        enabled = false;
+    }
+    public void Init(Controller controller)
+    {
         slider = GetComponent<Slider>();
+        slider.interactable = false;
+
+        this.controller = controller;
 
         slider.minValue = 0.0f;
         slider.maxValue = controller.MaxValue;
-    }
 
-    private void FixedUpdate()
+        enabled = true;
+    }
+    
+    private void Update()
     {
         slider.value =
             controller.Value / controller.MaxValue * slider.maxValue;

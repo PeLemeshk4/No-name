@@ -2,15 +2,21 @@ using UnityEngine;
 
 public class AttackAbility : MonoBehaviour
 {
-    [SerializeField] private CombatSystem combatSystem;
+    private CombatSystem combatSystem;
 
     private void Awake()
     {
+        enabled = false;
+    }
+    public void Init()
+    {
         combatSystem = GetComponent<CombatSystem>();
+
+        enabled = true;
     }
 
-    public void Attack(Weapon weapon)
+    public bool Attack(Weapon weapon, Vector2 direction)
     {
-        combatSystem.TryAttack(weapon);
+        return combatSystem.TryAttack(weapon, direction);
     }
 }

@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class JumpAbility : MonoBehaviour
 {
-    [SerializeField] private MovementSystem movementSystem;
-    [SerializeField] private float power = 8.0f;
+    private MovementSystem movementSystem;
+    private TagJump tagJump;
 
     private bool onGround = false;
 
@@ -11,20 +11,28 @@ public class JumpAbility : MonoBehaviour
     {
         get
         {
-            return power;
+            return tagJump.Power;
         }
     }
 
     private void Awake()
     {
+        enabled = false;
+    }
+    public void Init(TagJump tagJump)
+    {
+        this.tagJump = tagJump;
+
         movementSystem = GetComponent<MovementSystem>();
+
+        enabled = true;
     }
 
     public void Jump()
     {
         if (onGround)
         {
-            movementSystem.Jump(power);
+            movementSystem.Jump(tagJump.Power);
         }
     }
 
