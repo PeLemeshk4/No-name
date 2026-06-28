@@ -4,8 +4,12 @@ using UnityEngine.Tilemaps;
 
 public class GenerateMap : MonoBehaviour
 {
-    [SerializeField] private Tilemap tilemap;
-    [SerializeField] private RuleTile tile;
+    [SerializeField] private Tilemap lowerPlatform;
+    [SerializeField] private Tilemap upperPlatform;
+    [SerializeField] private RuleTile platform;
+    [SerializeField] private Tilemap lowerSpikes;
+    [SerializeField] private Tilemap upperSpikes;
+    [SerializeField] private Tile spike;
     [SerializeField] private GameObject player;
     [SerializeField] private Camera cam;
     [SerializeField] private float maxPercentOffset = 50;
@@ -30,6 +34,9 @@ public class GenerateMap : MonoBehaviour
     public void Init(GameObject player)
     {
         transform.position = new Vector3(-cam.orthographicSize * Screen.width / Screen.height, -cam.orthographicSize - 1, 0);
+
+        upperPlatform.transform.localPosition = new Vector3(0, 2 * cam.orthographicSize + 1, 0);
+        upperSpikes.transform.localPosition = new Vector3(0, 2 * cam.orthographicSize + 1, 0);
 
         parameters.g = player.GetComponent<Rigidbody2D>().gravityScale * Physics2D.gravity.y;
         parameters.m = player.GetComponent<Rigidbody2D>().mass;
@@ -123,23 +130,61 @@ public class GenerateMap : MonoBehaviour
         {
             if (previosPoint.y != points[i].y)
             {
+                BuildSpikes(previosPoint, points[i], reverse);
                 previosPoint = points[i];
                 continue;
             }
 
             int y = points[i].y;
-            for (int x = previosPoint.x; x < points[i].x; x++)
+            if (!reverse)
             {
-                for (int y1 = y; y1 >= 0; y1--)
+                for (int x = previosPoint.x; x <= points[i].x; x++)
                 {
-                    Vector3Int position = new Vector3Int(x, reverse ? (int)(cam.orthographicSize * 2) - y1 : y1, 0);
-                    
-                    tilemap.SetTile(position, tile);
-                }      
+                    for (int y1 = y; y1 >= 0; y1--)
+                    {
+                        Vector3Int position = new Vector3Int(x, y1, 0);
+
+                        lowerPlatform.SetTile(position, platform);
+                    }
+                }
             }
+            else
+            {
+                for (int x = previosPoint.x; x <= points[i].x; x++)
+                {
+                    for (int y1 = y; y1 >= 0; y1--)
+                    {
+                        Vector3Int position = new Vector3Int(x, y1, 0);
 
-
+                        upperPlatform.SetTile(position, platform);
+                    }
+                }
+            }
+            previosPoint = points[i];
         }
     }
 
+    private void BuildSpikes(Vector2Int firstPoint, Vector2Int secondPoint, bool reverse = false)
+    {
+        if (!reverse)
+        {
+            for (int x = firstPoint.x + 1; x <= secondPoint.x - 1; x++)
+            {
+                Vector3Int position = new Vector3Int(x, 0, 0);
+                lowerPlatform.SetTile(position, platform);
+                position.y += 1;
+                lowerSpikes.SetTile(position, spike);
+            }
+        }
+        else
+        {
+            for (int x = firstPoint.x + 1; x <= secondPoint.x - 1; x++)
+            {
+                Vector3Int position = new Vector3Int(x, 0, 0);
+                upperPlatform.SetTile(position, platform);
+                position.y += 1;
+                upperSpikes.SetTile(position, spike);
+            }
+        }        
+    }
 }

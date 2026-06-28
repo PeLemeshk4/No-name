@@ -27,7 +27,7 @@ public class HealthController : Controller
         value -= amount;
         if (value <= 0)
         {
-            HealthIsNull.Invoke(this, new EventArgs());
+            HealthIsNull?.Invoke(this, new EventArgs());
         }
         return true;
     }
