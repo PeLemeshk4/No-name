@@ -7,7 +7,7 @@ public class DashAbility : MonoBehaviour
     private TagDash tagDash;
     private StaminaController staminaController;
 
-    private bool isDash = false;
+    public bool IsDash { get; private set; } = false;
     private Vector2 dashDirection;
     private float time = 0.0f;
 
@@ -35,25 +35,25 @@ public class DashAbility : MonoBehaviour
     
     private void FixedUpdate()
     {
-        if (isDash)
+        if (IsDash)
         {
             movementSystem.Dash = dashDirection * tagDash.Speed;
             time += Time.fixedDeltaTime;
             if (time > tagDash.Length / tagDash.Speed)
             {
                 movementSystem.Dash = Vector2.zero;
-                isDash = false;
+                IsDash = false;
             }
         }
     }
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (isDash)
+        if (IsDash)
         {
             if (Vector2.Angle(dashDirection, collision.contacts[0].normal) <= 90.0f) return;
 
-            isDash = false;
+            IsDash = false;
             movementSystem.Dash = Vector2.zero;
             Vector2 normal = collision.contacts[0].normal;
             Vector2 directionBounce = dashDirection - 2.0f * Vector2.Dot(dashDirection, normal) * normal;
@@ -66,7 +66,7 @@ public class DashAbility : MonoBehaviour
         if (staminaController.TryConsume(tagDash.Cost))
         {
             dashDirection = direction;
-            isDash = true;
+            IsDash = true;
             time = 0.0f;
         }
     }

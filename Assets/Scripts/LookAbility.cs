@@ -7,10 +7,14 @@ public class LookAbility : MonoBehaviour
 
     public event EventHandler<ValueChangedEventArgs<Vector2>> directionChanged;
 
+    private void Awake()
+    {
+        gameObject.SetActive(false);
+    }
+
     public void ChangeDirectionLook(Vector2 direction)
     {
+        directionChanged?.Invoke(this, new ValueChangedEventArgs<Vector2>(Direction, direction));
         Direction = direction;
-
-        directionChanged?.Invoke(this, new ValueChangedEventArgs<Vector2>(direction));
     }
 }

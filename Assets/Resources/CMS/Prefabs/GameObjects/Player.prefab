@@ -251,8 +251,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player
   circleTimer: {fileID: 1773837566200579076}
   look: {fileID: 8608066287261078708}
-  timeOfAiming: 2
-  playerInput: {fileID: 0}
 --- !u!114 &4987060946189716924
 MonoBehaviour:
   m_ObjectHideFlags: 0

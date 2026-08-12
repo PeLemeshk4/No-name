@@ -5,7 +5,7 @@ public class JumpAbility : MonoBehaviour
     private MovementSystem movementSystem;
     private TagJump tagJump;
 
-    private bool onGround = false;
+    public bool OnGround { get; private set; } = false;
 
     public float Power
     {
@@ -28,12 +28,12 @@ public class JumpAbility : MonoBehaviour
         enabled = true;
     }
 
-    public void Jump()
+    public bool Jump()
     {
-        if (onGround)
-        {
-            movementSystem.Jump(tagJump.Power);
-        }
+        if (!OnGround) return false;
+
+        movementSystem.Jump(tagJump.Power);
+        return true;
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -41,7 +41,7 @@ public class JumpAbility : MonoBehaviour
         Vector2 normal = collision.contacts[0].normal;
         if (normal.y >= 0.4f)
         {
-            onGround = true;
+            OnGround = true;
         }
     }
 
@@ -52,12 +52,12 @@ public class JumpAbility : MonoBehaviour
             Vector2 normal = collision.contacts[0].normal;
             if (normal.y == 0)
             {
-                onGround = false;
+                OnGround = false;
             }
         }
         else
         {
-            onGround = false;
+            OnGround = false;
         }
     }
 }

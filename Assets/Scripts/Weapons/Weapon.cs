@@ -21,8 +21,8 @@ public class Weapon : MonoBehaviour
         }
         private set
         {
+            AttackingChanged?.Invoke(this, new ValueChangedEventArgs<bool>(isAttacking, value));
             isAttacking = value;
-            AttackingChanged?.Invoke(this, new ValueChangedEventArgs<bool>(isAttacking));
         }
     }
 

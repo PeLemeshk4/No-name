@@ -36,7 +36,7 @@ public class AttackHandler : MonoBehaviour
         healthController?.TryConsume(damage);
         attacked = true;
 
-        hasBeenAttacked?.Invoke(this, new ValueChangedEventArgs<bool>(true));
+        hasBeenAttacked?.Invoke(this, new ValueChangedEventArgs<bool>(false, true));
     }
 
     private void OnChangeDirectionLook(object s, ValueChangedEventArgs<Vector2> e)

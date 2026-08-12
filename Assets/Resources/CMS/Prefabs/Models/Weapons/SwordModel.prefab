@@ -56,5 +56,5 @@ MonoBehaviour:
         Damage: 2
         Length: 2
         Width: 0.25
-        AttackDuration: 0.33
+        AttackDuration: 0.3
         attackStages: {x: 20, y: 60, z: 20}

@@ -1,9 +1,15 @@
+using NUnit.Framework.Constraints;
 using System;
+using System.Collections;
+using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
+    private PlayerInput playerInput;
+
     private MoveAbility moveAbility;
     private JumpAbility jumpAbility;
     private TimeSlowAbility timeSlowAbility;
@@ -11,22 +17,29 @@ public class Player : MonoBehaviour
     private ActiveWeapon activeWeapon;
     private AttackAbility attackAbility;
     private Animator animator;
-    private SpriteRenderer spriteRenderer;
-
-    [SerializeField] private Rigidbody2D rb;
+    private Rigidbody2D rb;
+    private SpriteRenderer sr;
     [SerializeField] private CircleTimer circleTimer;
     [SerializeField] private GameObject look;
-    [SerializeField] private float timeOfAiming = 2.0f;
 
-    [SerializeField] private PlayerInput playerInput;
+    private StateManager sM;
+    private AnimationManager aM;
+
+    // Parameters
+    private const float quickActionTime = 0.1f;
+    private const float aimingTime = 2.0f;
+    private const float bufferTime = 0.2f;
+
+    // Variables
     private float moveDirection = 0;
+    private float characterDirection = 1;
     private Vector2 lookDirection = Vector2.zero;
-    private bool isAttacking = false;
-    private bool isDashing = false;
-    private float time = 0.0f;
-    private bool hasSlowing = false;
+    private bool startAiming = false;
+    private bool aiming = false;
+    private float aimmingTime = 0.0f;
+    private bool wantJump = false;
+    private float currentBufferTime = 0;
 
-    // Сделать поведение, чтобы класс не хранил ссылки на классы, а только использовал их
     private void Awake()
     {
         enabled = false;
@@ -46,91 +59,85 @@ public class Player : MonoBehaviour
         activeWeapon = GetComponent<ActiveWeapon>();
         attackAbility = GetComponent<AttackAbility>();
         animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
 
-        //
-        look.SetActive(false);
+        sM = new StateManager(States.Idle);
+        aM = new AnimationManager(animator, sM);
 
         circleTimer.timerEnded += TimerEnd;
+
+        sM.AddBlockedState(States.Dash, () => dashAbility.IsDash);
+        sM.AddBlockedState(States.Attack, () => activeWeapon.Weapon.IsAttacking);        
 
         enabled = true;
     }
 
     private void Update()
     {
-        if (isDashing)
-        {
-            SetLookDirection();
-            if (!hasSlowing)
-            {
-                SlowTimeStart();
-            }
-        }
-        else if (isAttacking)
-        {
-            time += Time.deltaTime;
-            if (time > 0.1f)
-            {
-                SetLookDirection();
-                if (!hasSlowing)
-                {
-                    SlowTimeStart();
-                }
-            }
-            else
-            {
-                lookDirection = new Vector2(lookDirection.x, 0).normalized;
-            }
-        }
-        else
-        {
-            SetLookDirection();
-        }
+        SetLookDirection();
 
-        if (!activeWeapon.Weapon.IsAttacking)
-        {
-            spriteRenderer.flipX = lookDirection.x < 0 ? true : false;
-        }
-
-        if (activeWeapon.Weapon.IsAttacking)
+        if (sM.StateBlocked())
         {
             moveAbility.Direction = 0;
-            animator.SetBool("Attacking", true);
-            animator.SetBool("Running", false);
-            animator.SetBool("Fall", false);
-            animator.SetBool("Jump", false);
+            return;
         }
-        else if (Mathf.Abs(rb.linearVelocityY) > 0.1f)
+
+        // Определение "свободной" анимации
+        if (jumpAbility.OnGround)
         {
-            moveAbility.Direction = moveDirection;
-            animator.SetBool("Attacking", false);
-            animator.SetBool("Running", false);
-            if (rb.linearVelocityY > 0)
+            if (Mathf.Abs(rb.linearVelocityX) > 0.1) sM.SetState(States.Run);
+            else sM.SetState(States.Idle);
+        }
+        else if (rb.linearVelocityY > 0) sM.SetState(States.Jump);
+        else if (rb.linearVelocityY < 0) sM.SetState(States.Fall);
+
+        moveAbility.Direction = moveDirection;
+        characterDirection = moveDirection != 0 ? moveDirection : characterDirection;
+
+        // Буферизация прыжка
+        if (wantJump)
+        {
+            if (currentBufferTime <= bufferTime)
             {
-                animator.SetBool("Fall", false);
-                animator.SetBool("Jump", true);
+                if (jumpAbility.Jump())
+                {
+                    wantJump = false;
+                }
+                else
+                {
+                    currentBufferTime += Time.deltaTime;
+                }   
             }
             else
             {
-                animator.SetBool("Jump", false);
-                animator.SetBool("Fall", true);
+                wantJump = false;
+            }
+        }
+
+        // Поворот спрайта от направления
+        if (aiming)
+        {
+            if (Mathf.Abs(lookDirection.x) > 0)
+            {
+                sr.flipX = lookDirection.x < 0;
             }
         }
         else
         {
-            moveAbility.Direction = moveDirection;
-            animator.SetBool("Fall", false);
-            animator.SetBool("Jump", false);
-            animator.SetBool("Attacking", false);
+            sr.flipX = characterDirection < 0;
+        }
 
-            if (moveAbility.Direction != 0)
+        // Логика начала прицеливания
+        if (!aiming && startAiming)
+        {
+            if (aimmingTime < quickActionTime)
             {
-                animator.SetBool("Running", true);
+                aimmingTime += Time.deltaTime;
             }
             else
             {
-                animator.SetBool("Running", false);
+                StartAiming();
             }
         }    
     }
@@ -153,60 +160,78 @@ public class Player : MonoBehaviour
 
     private void OnJump()
     {
-        jumpAbility.Jump();
+        wantJump = true;
+        currentBufferTime = 0.0f;
     }
 
     private void OnDashStarted(InputAction.CallbackContext context)
     {
-        if (isAttacking) return;
-
-        isDashing = true;
+        if (startAiming) return;
+        startAiming = true;
+        aimmingTime = 0.0f;
     }
 
     private void OnDashCanceled(InputAction.CallbackContext context)
     {
-        if (!isDashing) return;
+        if (!startAiming) return;
 
-        dashAbility.Dash(lookDirection);
+        if (!sM.StateBlocked())
+        {
+            dashAbility.Dash(lookDirection);
+            sM.SetState(States.Dash);
+        }
+
+        startAiming = false;
+
+        if (!aiming) return;
         circleTimer.StopTimer();
     }
 
     private void OnAttackStarted(InputAction.CallbackContext context)
     {
-        if (isDashing) return;
-
-        lookDirection = new Vector2(lookDirection.x, 0).normalized;
-        isAttacking = true;    
+        if (startAiming) return;
+        startAiming = true;
+        aimmingTime = 0.0f;
     }
 
     private void OnAttackCanceled(InputAction.CallbackContext context)
     {
-        if (!isAttacking) return;
+        if (!startAiming) return;
 
-        moveAbility.Direction = 0;
-        attackAbility.Attack(activeWeapon.Weapon, lookDirection);
+        if (!sM.StateBlocked())
+        {
+            if (aiming)
+            {
+                attackAbility.Attack(activeWeapon.Weapon, lookDirection);
+            }
+            else
+            {
+                attackAbility.Attack(activeWeapon.Weapon, new Vector2(characterDirection, 0));
+            }
+            sM.SetState(States.Attack);
+        }
+
+        startAiming = false;
+
+        if (!aiming) return;
         circleTimer.StopTimer();
     }
 
-    private void SlowTimeStart()
+    private void StartAiming()
     {
+        aiming = true;
         timeSlowAbility.IsActive = true;
-        hasSlowing = true;
 
         look.SetActive(true);
-        circleTimer.StartTimer(timeOfAiming);
+        circleTimer.StartTimer(aimingTime);
     }
 
     private void TimerEnd(object o, EventArgs e)
     {
-        look.SetActive(false);
-
+        startAiming = false;
+        aiming = false;
         timeSlowAbility.IsActive = false;
-        hasSlowing = false;
-        time = 0.0f;
 
-        if (isAttacking) isAttacking = false;
-        else if (isDashing) isDashing = false;
+        look.SetActive(false);    
     }
-
 }
