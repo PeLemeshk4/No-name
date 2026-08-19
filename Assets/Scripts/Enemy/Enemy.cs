@@ -12,7 +12,7 @@ public class Enemy : Initializer
 
     public override void Init(CMSEntity model)
     {
-        moveAbility.Init(model.Get<TagSpeed>());
+
         
     }
 }

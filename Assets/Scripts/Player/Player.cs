@@ -26,7 +26,7 @@ public class Player : MonoBehaviour
     private AnimationManager aM;
 
     // Parameters
-    private const float quickActionTime = 0.1f;
+    private const float quickActionTime = 0.05f;
     private const float aimingTime = 2.0f;
     private const float bufferTime = 0.2f;
 
@@ -77,14 +77,14 @@ public class Player : MonoBehaviour
     {
         SetLookDirection();
 
-        if (sM.StateBlocked())
+        if (sM.IsStateLocked())
         {
             moveAbility.Direction = 0;
             return;
         }
 
-        // Определение "свободной" анимации
-        if (jumpAbility.OnGround)
+        // Определение состояния игрока
+        if (!jumpAbility.NotOnGround)
         {
             if (Mathf.Abs(rb.linearVelocityX) > 0.1) sM.SetState(States.Run);
             else sM.SetState(States.Idle);
@@ -100,7 +100,7 @@ public class Player : MonoBehaviour
         {
             if (currentBufferTime <= bufferTime)
             {
-                if (jumpAbility.Jump())
+                if (jumpAbility.Jump(dashAbility.IsBounce))
                 {
                     wantJump = false;
                 }
@@ -175,7 +175,7 @@ public class Player : MonoBehaviour
     {
         if (!startAiming) return;
 
-        if (!sM.StateBlocked())
+        if (!sM.IsStateLocked())
         {
             dashAbility.Dash(lookDirection);
             sM.SetState(States.Dash);
@@ -198,7 +198,7 @@ public class Player : MonoBehaviour
     {
         if (!startAiming) return;
 
-        if (!sM.StateBlocked())
+        if (!sM.IsStateLocked())
         {
             if (aiming)
             {

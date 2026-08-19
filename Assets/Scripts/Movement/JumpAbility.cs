@@ -1,11 +1,19 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class JumpAbility : MonoBehaviour
 {
-    private MovementSystem movementSystem;
+    private Rigidbody2D rb;
     private TagJump tagJump;
 
-    public bool OnGround { get; private set; } = false;
+    private bool onGround = false;
+    private float noDoubleJumpTime = 0.1f;
+    private float afterJumpTime = 0.0f;
+    private bool isJump = false;
+    private float coyoteTime = 0.15f;
+    private float fallTime = 0.0f;
+
+    public bool NotOnGround { get; private set; } = false;
 
     public float Power
     {
@@ -19,45 +27,69 @@ public class JumpAbility : MonoBehaviour
     {
         enabled = false;
     }
-    public void Init(TagJump tagJump)
+    public void Init(TagJump tagJump, Rigidbody2D rb)
     {
         this.tagJump = tagJump;
-
-        movementSystem = GetComponent<MovementSystem>();
+        this.rb = rb;
 
         enabled = true;
     }
 
-    public bool Jump()
+    private void Update()
     {
-        if (!OnGround) return false;
+        if (afterJumpTime <= noDoubleJumpTime)
+        {
+            afterJumpTime += Time.deltaTime;
+        }
+        else
+        {
+            isJump = false;
+        }
 
-        movementSystem.Jump(tagJump.Power);
+        if (NotOnGround && onGround)
+        {
+            if (fallTime >= coyoteTime)
+            {
+                onGround = false;
+            }
+            fallTime += Time.deltaTime;
+        }
+    }
+
+    public bool Jump(bool afterDash = false)
+    {
+        if (!onGround) return false;
+        if (afterJumpTime < noDoubleJumpTime) return false;
+
+        rb.AddForceY(afterDash ? Power / 4 : Power, ForceMode2D.Impulse);
+        afterJumpTime = 0.0f;
+        onGround = false;
+        NotOnGround = true;
+        fallTime = 0.0f;
+        isJump = true;
         return true;
     }
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        Vector2 normal = collision.contacts[0].normal;
-        if (normal.y >= 0.4f)
+        if (isJump) return;
+
+        foreach (ContactPoint2D contact in collision.contacts)
         {
-            OnGround = true;
+            Vector2 normal = contact.normal;
+            if (normal.y >= 0.4f)
+            {
+                onGround = true;
+                NotOnGround = false;
+
+                return;
+            }
         }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.contacts.Length != 0)
-        {
-            Vector2 normal = collision.contacts[0].normal;
-            if (normal.y == 0)
-            {
-                OnGround = false;
-            }
-        }
-        else
-        {
-            OnGround = false;
-        }
+        NotOnGround = true;
+        fallTime = 0.0f;
     }
 }

@@ -15,11 +15,11 @@ GameObject:
   - component: {fileID: 8338226730794068869}
   - component: {fileID: 7225988237292190386}
   - component: {fileID: 1992203957112980355}
-  - component: {fileID: 4987060946189716924}
   - component: {fileID: 4366464295421465839}
   - component: {fileID: 906815913801184519}
   - component: {fileID: 1786095712310686156}
   - component: {fileID: 8238812581369025892}
+  - component: {fileID: 6638476860781490277}
   - component: {fileID: 1223849136772956556}
   - component: {fileID: 230590593942037467}
   - component: {fileID: 2855487874663679822}
@@ -195,6 +195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1230a6caee04dfe43b9e9e8e5c3d50c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInitializer
+  rb: {fileID: 0}
   moveAbility: {fileID: 0}
   jumpAbility: {fileID: 0}
   timeSlowAbility: {fileID: 0}
@@ -251,19 +252,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player
   circleTimer: {fileID: 1773837566200579076}
   look: {fileID: 8608066287261078708}
---- !u!114 &4987060946189716924
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1823644327994091381}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5e40256023fcfb43b9306c3940c596d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MovementSystem
-  rb: {fileID: 5318927058512136916}
 --- !u!114 &4366464295421465839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -312,6 +300,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d2e1af3ff6eaf447becd2d07857adf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DashAbility
+--- !u!114 &6638476860781490277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1823644327994091381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55364ecfb3f4fb94cba2a7e773c44a08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerVelocityManager
 --- !u!114 &1223849136772956556
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -348,7 +348,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08f650bb4d7dfac48a42deabe6c36c5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatSystem
-  movementSystem: {fileID: 4987060946189716924}
+  movementSystem: {fileID: 0}
 --- !u!114 &6317761113704147863
 MonoBehaviour:
   m_ObjectHideFlags: 0

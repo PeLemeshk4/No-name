@@ -4,6 +4,7 @@ using UnityEngine;
 public class EnemyInitializer : Initializer
 {
     [Header("AutoAdd")]
+    [SerializeField] private Rigidbody2D rb;
     [SerializeField] private MoveAbility moveAbility;
     [SerializeField] private LookAbility lookAbility;
     [SerializeField] private AttackAbility attackAbility;
@@ -17,6 +18,7 @@ public class EnemyInitializer : Initializer
 
     public override void Init(CMSEntity model)
     {
+        rb = GetComponent<Rigidbody2D>();
         moveAbility = GetComponent<MoveAbility>();
         healthController = GetComponent<HealthController>();
         attackHandler = GetComponent<AttackHandler>();

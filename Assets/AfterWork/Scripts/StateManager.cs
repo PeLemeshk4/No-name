@@ -14,7 +14,7 @@ public enum States
 
 public class StateManager
 {
-    private Dictionary<States, Func<bool>> blockedStates = new Dictionary<States, Func<bool>>();
+    private Dictionary<States, Func<bool>> lockedStates = new Dictionary<States, Func<bool>>();
 
     public States CurrentState { private set; get; }
     public event EventHandler<ValueChangedEventArgs<States>> StateChanged;
@@ -27,17 +27,17 @@ public class StateManager
         return true;
     }
 
-    public bool StateBlocked()
+    public bool IsStateLocked()
     {
-        return blockedStates.TryGetValue(CurrentState, out Func<bool> isBlocked) && isBlocked();
+        return lockedStates.TryGetValue(CurrentState, out Func<bool> isLocked) && isLocked();
     }
 
     public bool AddBlockedState(States state, Func<bool> isState)
     {
         if (isState == null) return false;
-        if (blockedStates.ContainsKey(state)) return false;
+        if (lockedStates.ContainsKey(state)) return false;
 
-        blockedStates.Add(state, isState);
+        lockedStates.Add(state, isState);
         return true;
     }
 

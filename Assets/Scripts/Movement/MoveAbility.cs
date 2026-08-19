@@ -3,10 +3,9 @@ using UnityEngine;
 
 public class MoveAbility : MonoBehaviour
 {
-    private MovementSystem movementSystem;
     private TagSpeed tagSpeed;
 
-    private float direction = 0.0f;
+    public float Direction { get; set; } = 0.0f;
 
     public float Speed
     {
@@ -15,16 +14,11 @@ public class MoveAbility : MonoBehaviour
             return tagSpeed.Speed;
         }
     }
-
-    public float Direction 
+    public float MoveVelocity
     {
         get
         {
-            return direction;
-        }
-        set
-        {
-            direction = value;
+            return Direction * Speed;
         }
     }
 
@@ -36,13 +30,6 @@ public class MoveAbility : MonoBehaviour
     {
         this.tagSpeed = tagSpeed;
 
-        movementSystem = GetComponent<MovementSystem>();
-
         enabled = true;
-    }
-
-    private void FixedUpdate()
-    {
-        movementSystem.Move = direction * tagSpeed.Speed;
     }
 }
