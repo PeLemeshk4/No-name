@@ -6,6 +6,7 @@ public class TagDash : EntityComponentDefinition
 {
     public float Length;
     public float Speed;
+    public float MaxSlowing;
     public float Cost;
-    public float PowerOfBounce;
+    public float BouncePower;
 }

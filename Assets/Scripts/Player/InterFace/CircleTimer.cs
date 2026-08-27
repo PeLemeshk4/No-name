@@ -13,6 +13,13 @@ public class CircleTimer : MonoBehaviour
 
     public event EventHandler<EventArgs> timerEnded;
 
+    public float CompletePercent
+    {
+        get
+        {
+            return currentTime / totalTime;
+        }
+    }
 
     private void Awake()
     {
@@ -34,26 +41,26 @@ public class CircleTimer : MonoBehaviour
     {
         if (!isRunning) return;
 
-        currentTime -= Time.deltaTime / Time.timeScale;
+        currentTime += Time.deltaTime / Time.timeScale;
         UpdateVisual();
 
-        if (currentTime <= 0)
+        if (currentTime >= totalTime)
         {
+            currentTime = totalTime;
             StopTimer();
         }
     }
 
     private void UpdateVisual()
     {
-        float fillAmount = currentTime / totalTime;
-        timerImage.fillAmount = fillAmount;
-        timerImage.color = Color.Lerp(Color.red, Color.green, fillAmount);
+        timerImage.fillAmount = CompletePercent;
+        timerImage.color = Color.Lerp(Color.red, Color.green, CompletePercent);
     }
 
     public void StartTimer(float time)
     {
         totalTime = time;
-        currentTime = totalTime;
+        currentTime = 0.0f;
         isRunning = true;
         gameObject.SetActive(true);
     }

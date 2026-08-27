@@ -5,6 +5,7 @@ using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
@@ -26,7 +27,7 @@ public class Player : MonoBehaviour
     private AnimationManager aM;
 
     // Parameters
-    private const float quickActionTime = 0.05f;
+    private const float quickActionTime = 0.15f;
     private const float aimingTime = 2.0f;
     private const float bufferTime = 0.2f;
 
@@ -34,11 +35,17 @@ public class Player : MonoBehaviour
     private float moveDirection = 0;
     private float characterDirection = 1;
     private Vector2 lookDirection = Vector2.zero;
-    private bool startAiming = false;
     private bool aiming = false;
     private float aimmingTime = 0.0f;
     private bool wantJump = false;
     private float currentBufferTime = 0;
+    private bool wantAiming = false;
+    private bool willDash = false;
+    private bool wantDash = false;
+    private Vector2 dashDirection = Vector2.zero;
+    private bool willAttack = false;
+    private bool wantAttack = false;
+    private Vector2 attackDirection = Vector2.zero;
 
     private void Awake()
     {
@@ -77,11 +84,92 @@ public class Player : MonoBehaviour
     {
         SetLookDirection();
 
-        if (sM.IsStateLocked())
+        if (willDash)
         {
-            moveAbility.Direction = 0;
-            return;
+            if (sM.IsStateLocked() && sM.CurrentState != States.Dash)
+            {
+                wantDash = false;
+                willDash = false;
+                wantAiming = false;
+
+                if (aiming) circleTimer.StopTimer();
+
+                return;
+            }
+
+            if (wantDash)
+            {
+                sM.SetState(States.Dash);
+
+                dashAbility.Dash(dashDirection, 0.5f + 0.5f * circleTimer.CompletePercent);
+
+                wantDash = false;
+                willDash = false;
+                wantAiming = false;
+
+                if (aiming) circleTimer.StopTimer();
+
+                return;
+            }
+            else if (wantAiming)
+            {
+                StartAiming();
+                wantAiming = false;
+            }
         }
+
+        if (willAttack)
+        {
+            if (sM.IsStateLocked())
+            {
+                wantAttack = false;
+                willAttack = false;
+                wantAiming = false;
+
+                if (aiming) circleTimer.StopTimer();
+
+                return;
+            }
+
+            if (wantAttack)
+            {
+                sM.SetState(States.Attack);
+
+                if (aiming)
+                {
+                    attackAbility.Attack(activeWeapon.Weapon, attackDirection);
+                }
+                else
+                {
+                    attackAbility.Attack(activeWeapon.Weapon, new Vector2(characterDirection, 0));
+                }
+
+                wantAttack = false;
+                willAttack = false;
+                wantAiming = false;
+
+                if (aiming) circleTimer.StopTimer();
+
+                moveAbility.Direction = 0;
+
+                return;
+
+            }
+            else if (wantAiming)
+            {
+                if (aimmingTime < quickActionTime)
+                {
+                    aimmingTime += Time.deltaTime;
+                }
+                else
+                {
+                    StartAiming();
+                    wantAiming = false;
+                }
+            }
+        }
+
+        if (sM.IsStateLocked()) return;
 
         // Определение состояния игрока
         if (!jumpAbility.NotOnGround)
@@ -121,25 +209,13 @@ public class Player : MonoBehaviour
             if (Mathf.Abs(lookDirection.x) > 0)
             {
                 sr.flipX = lookDirection.x < 0;
+                characterDirection = sr.flipX ? -1 : 1;
             }
         }
         else
         {
             sr.flipX = characterDirection < 0;
-        }
-
-        // Логика начала прицеливания
-        if (!aiming && startAiming)
-        {
-            if (aimmingTime < quickActionTime)
-            {
-                aimmingTime += Time.deltaTime;
-            }
-            else
-            {
-                StartAiming();
-            }
-        }    
+        }  
     }
 
     private void SetLookDirection()
@@ -166,55 +242,35 @@ public class Player : MonoBehaviour
 
     private void OnDashStarted(InputAction.CallbackContext context)
     {
-        if (startAiming) return;
-        startAiming = true;
-        aimmingTime = 0.0f;
+        if (wantAiming || aiming) return;
+
+        wantAiming = true;
+        willDash = true;
     }
 
     private void OnDashCanceled(InputAction.CallbackContext context)
     {
-        if (!startAiming) return;
+        if (!willDash) return;
 
-        if (!sM.IsStateLocked())
-        {
-            dashAbility.Dash(lookDirection);
-            sM.SetState(States.Dash);
-        }
-
-        startAiming = false;
-
-        if (!aiming) return;
-        circleTimer.StopTimer();
+        wantDash = true;
+        dashDirection = lookDirection;
     }
 
     private void OnAttackStarted(InputAction.CallbackContext context)
     {
-        if (startAiming) return;
-        startAiming = true;
+        if (wantAiming || aiming) return;
+
+        wantAiming = true;
+        willAttack = true;
         aimmingTime = 0.0f;
     }
 
     private void OnAttackCanceled(InputAction.CallbackContext context)
     {
-        if (!startAiming) return;
+        if (!willAttack) return;
 
-        if (!sM.IsStateLocked())
-        {
-            if (aiming)
-            {
-                attackAbility.Attack(activeWeapon.Weapon, lookDirection);
-            }
-            else
-            {
-                attackAbility.Attack(activeWeapon.Weapon, new Vector2(characterDirection, 0));
-            }
-            sM.SetState(States.Attack);
-        }
-
-        startAiming = false;
-
-        if (!aiming) return;
-        circleTimer.StopTimer();
+        wantAttack = true;
+        attackDirection = lookDirection;
     }
 
     private void StartAiming()
@@ -228,10 +284,20 @@ public class Player : MonoBehaviour
 
     private void TimerEnd(object o, EventArgs e)
     {
-        startAiming = false;
         aiming = false;
         timeSlowAbility.IsActive = false;
 
         look.SetActive(false);    
+
+        if (willDash)
+        {
+            wantDash = true;
+            dashDirection = lookDirection;
+        }
+        else if (willAttack)
+        {
+            wantAttack = true;
+            attackDirection = lookDirection;
+        }
     }
 }

@@ -6,14 +6,16 @@ public class JumpAbility : MonoBehaviour
     private Rigidbody2D rb;
     private TagJump tagJump;
 
-    private bool onGround = false;
+    // Parameters
     private float noDoubleJumpTime = 0.1f;
+    private float coyoteTime = 0.15f;
+
+    // Variables
+    private bool onGround = false;
     private float afterJumpTime = 0.0f;
     private bool isJump = false;
-    private float coyoteTime = 0.15f;
     private float fallTime = 0.0f;
-
-    public bool NotOnGround { get; private set; } = false;
+    public bool NotOnGround { get; private set; } = true;
 
     public float Power
     {
