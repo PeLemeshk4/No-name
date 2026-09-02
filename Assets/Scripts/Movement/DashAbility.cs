@@ -8,9 +8,11 @@ public class DashAbility : MonoBehaviour
     private StaminaController staminaController;
 
     private Vector2 dashDirection = Vector2.zero;
+    private float realLength = 0.0f;
     private float dashDistance = 0.0f;
     private Vector2 dashFallVelocity = Vector2.zero;
     private float dashFallAccelerate = Physics.gravity.y;
+
     private float bounceXPower = 0.0f;
     private float bounceTime = 0.0f;
     private float xResistance = 0.0f;
@@ -68,13 +70,13 @@ public class DashAbility : MonoBehaviour
         if (IsDash)
         {
             dashDistance += ((DashVelocity - dashFallVelocity) * Time.fixedDeltaTime).magnitude;
-            if (dashDistance > Length)
+            if (dashDistance > realLength)
             {
                 IsDash = false;
                 DashVelocity = Vector2.zero;
                 rb.linearVelocityY = rb.linearVelocityY >= 0.0f ? 0.0f : rb.linearVelocityY;
             }
-            else if (dashDistance >= Length * 2.0f / 3.0f)
+            else if (dashDistance >= realLength * 2.0f / 3.0f)
             {
                 dashFallVelocity.y += dashFallAccelerate * Time.fixedDeltaTime;
                 DashVelocity = dashDirection * Speed * (1 - GetDashSlowing()) + dashFallVelocity;
@@ -101,9 +103,9 @@ public class DashAbility : MonoBehaviour
 
     private float GetDashSlowing()
     {
-        if (dashDistance >= Length) return MaxSlowing;
+        if (dashDistance >= realLength) return MaxSlowing;
 
-        float delta = Mathf.Pow(0.2f, Distribute(0, Length, 0, 3, Length - dashDistance));
+        float delta = Mathf.Pow(0.2f, Distribute(0, realLength, 0, 3, realLength - dashDistance));
         float resistance = delta;
 
         return resistance > MaxSlowing ? MaxSlowing : resistance;
@@ -178,14 +180,15 @@ public class DashAbility : MonoBehaviour
         }
     }
 
-    public void Dash(Vector2 direction, float valuePower)
+    public void Dash(Vector2 direction, float dashPower)
     {
         if (staminaController.TryConsume(tagDash.Cost))
         {
             IsBounce = false;
             BounceXVelocity = 0.0f;
 
-            dashDirection = direction * valuePower;
+            realLength = Length * dashPower;
+            dashDirection = direction * dashPower;
             DashVelocity = dashDirection * Speed;
             IsDash = true;
             dashDistance = 0.0f;
