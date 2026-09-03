@@ -53,8 +53,8 @@ public class CircleTimer : MonoBehaviour
 
     private void UpdateVisual()
     {
-        timerImage.fillAmount = CompletePercent;
-        timerImage.color = Color.Lerp(Color.red, Color.green, CompletePercent);
+        timerImage.fillAmount = 1 - CompletePercent;
+        timerImage.color = Color.Lerp(Color.green, Color.red, CompletePercent);
     }
 
     public void StartTimer(float time)

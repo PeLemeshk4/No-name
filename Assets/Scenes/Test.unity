@@ -273,7 +273,6 @@ GameObject:
   - component: {fileID: 159134830}
   - component: {fileID: 159134829}
   - component: {fileID: 159134828}
-  - component: {fileID: 159134827}
   m_Layer: 0
   m_Name: UpperSpikes
   m_TagString: Untagged
@@ -319,19 +318,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!114 &159134827
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 159134825}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52ef0f7dfd2ef91409fa4ac438782cbe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TouchDamage
-  damage: 1
 --- !u!66 &159134828
 CompositeCollider2D:
   m_ObjectHideFlags: 0
@@ -1374,7 +1360,6 @@ GameObject:
   - component: {fileID: 800305982}
   - component: {fileID: 800305981}
   - component: {fileID: 800305980}
-  - component: {fileID: 800305979}
   m_Layer: 0
   m_Name: LowerSpikes
   m_TagString: Untagged
@@ -1420,19 +1405,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!114 &800305979
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 800305977}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52ef0f7dfd2ef91409fa4ac438782cbe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TouchDamage
-  damage: 1
 --- !u!66 &800305980
 CompositeCollider2D:
   m_ObjectHideFlags: 0
