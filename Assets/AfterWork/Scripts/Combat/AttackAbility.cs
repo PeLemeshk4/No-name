@@ -1,7 +1,11 @@
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class AttackAbility : MonoBehaviour
 {
+    public event EventHandler<EventArgs> IsAttacked;
+
     private void Awake()
     {
         enabled = false;
@@ -16,6 +20,11 @@ public class AttackAbility : MonoBehaviour
         if (weapon  == null) return false;
         if (direction == Vector2.zero) return false;
 
-        return weapon.Attack(direction);
+        if (weapon.Attack(direction))
+        {
+            IsAttacked?.Invoke(this, new EventArgs());
+            return true;
+        }
+        else return false;
     }
 }

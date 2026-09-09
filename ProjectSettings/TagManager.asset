@@ -8,6 +8,7 @@ TagManager:
   - HealthBar
   - StaminaBar
   - Map
+  - ActionData
   layers:
   - Default
   - TransparentFX

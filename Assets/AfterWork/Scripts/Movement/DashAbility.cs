@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -22,6 +23,8 @@ public class DashAbility : MonoBehaviour
 
     public bool IsBounce { get; private set; } = false;
     public float BounceXVelocity { get; private set; } = 0.0f;
+
+    public event EventHandler<EventArgs> IsDashed;
 
     public float Length
     {
@@ -193,6 +196,8 @@ public class DashAbility : MonoBehaviour
             IsDash = true;
             dashDistance = 0.0f;
             dashFallVelocity = Vector2.zero;
+
+            IsDashed?.Invoke(this, new EventArgs());
         }
     }
 

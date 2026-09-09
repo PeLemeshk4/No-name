@@ -21,6 +21,8 @@ public class PlayerInitializer : Initializer
     [SerializeField] private CircleTimer circleTimer;
     [SerializeField] private GameObject look;
 
+    public PlayerActionTracker actionTracker;
+
     public override void Init(CMSEntity model)
     {
         rb = GetComponent<Rigidbody2D>();
@@ -48,5 +50,8 @@ public class PlayerInitializer : Initializer
         attackHandler.Init(look.GetComponent<LookAbility>(), healthController); //?
         circleTimer.Init();
         player.Init();
+
+        actionTracker = new PlayerActionTracker(dashAbility, attackAbility);
+        actionTracker.StartTracking();
     }
 }

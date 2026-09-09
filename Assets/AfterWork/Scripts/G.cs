@@ -12,6 +12,7 @@ public class G : MonoBehaviour
 
     private SliderOfController healthPlayerSlider;
     private SliderOfController staminaPlayerSlider;
+    private ActionDataUI actionData;
 
     private void Awake()
     {
@@ -36,7 +37,10 @@ public class G : MonoBehaviour
         staminaPlayerSlider.Init(player.GetComponent<StaminaController>());
         healthPlayerSlider = GameObject.FindGameObjectWithTag("HealthBar").GetComponent<SliderOfController>();
         healthPlayerSlider.Init(player.GetComponent<HealthController>());
-        
+        actionData = GameObject.FindGameObjectWithTag("ActionData").GetComponent<ActionDataUI>();
+        actionData.Init(player.GetComponent<PlayerInitializer>().actionTracker);
+
+
         GenerateMap map = GameObject.FindGameObjectWithTag("Map").GetComponent<GenerateMap>();
         map.Init(player);
         map.Generate();
@@ -45,13 +49,5 @@ public class G : MonoBehaviour
         CameraMove camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMove>();
         camera.Init(player.transform);
 
-    }
-
-    public void CreateEnemy()
-    {
-        GameObject enemy = Factory.Create(
-            enemyPfb,
-            enemyModel);
-        enemy.transform.position = new Vector3(-5, 2, 0);
     }
 }
