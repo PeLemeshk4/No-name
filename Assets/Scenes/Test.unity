@@ -1878,7 +1878,7 @@ Transform:
   m_GameObject: {fileID: 1059948813}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.03228, y: -0.40881, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1980,35 +1980,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1227611484}
-  - component: {fileID: 1227611483}
+  - component: {fileID: 1227611485}
   m_Layer: 0
-  m_Name: GenerateMap
+  m_Name: Map
   m_TagString: Map
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1227611483
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1227611482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4cb3de3632532914da8a168af30865f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GenerateMap
-  lowerPlatform: {fileID: 389547661}
-  upperPlatform: {fileID: 987799332}
-  platform: {fileID: 11400000, guid: ee385c6ed6ded5a4aa5b38aa32fe21af, type: 2}
-  lowerSpikes: {fileID: 800305978}
-  upperSpikes: {fileID: 159134826}
-  spike: {fileID: 11400000, guid: a7ddd2b6576e84d40affd1c2c5e3dee8, type: 2}
-  player: {fileID: 0}
-  cam: {fileID: 1637662171}
-  maxPercentOffset: 50
 --- !u!4 &1227611484
 Transform:
   m_ObjectHideFlags: 0
@@ -2025,6 +2004,22 @@ Transform:
   - {fileID: 1986027493}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1227611485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1227611482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91a4975cee63eb345bd7f23e2426c805, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapBuilder
+  cam: {fileID: 1637662171}
+  platformTile: {fileID: 11400000, guid: ee385c6ed6ded5a4aa5b38aa32fe21af, type: 2}
+  lowerPlatform: {fileID: 389547661}
+  upperPlatform: {fileID: 987799332}
 --- !u!1 &1279540626
 GameObject:
   m_ObjectHideFlags: 0
@@ -2096,8 +2091,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 813, y: 581}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 654.0696, y: 581}
+  m_SizeDelta: {x: 603.9193, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1395347978
 MonoBehaviour:
@@ -2108,7 +2103,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1395347976}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c09f8e3b704a09d4a8939652f0d91238, type: 3}
+  m_Script: {fileID: 11500000, guid: 54ced86acbe31bb4aabcfc5f10461f7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ActionData
   textMeshPro: {fileID: 0}

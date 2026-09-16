@@ -9,6 +9,8 @@ using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
+    private TagPlayer tagPlayer;
+
     private PlayerInput playerInput;
 
     private MoveAbility moveAbility;
@@ -17,7 +19,6 @@ public class Player : MonoBehaviour
     private DashAbility dashAbility;
     private ActiveWeapon activeWeapon;
     private AttackAbility attackAbility;
-    private Animator animator;
     private Rigidbody2D rb;
     private SpriteRenderer sr;
     [SerializeField] private CircleTimer circleTimer;
@@ -28,7 +29,6 @@ public class Player : MonoBehaviour
 
     // Parameters
     private const float quickActionTime = 0.15f;
-    private const float aimingTime = 2.0f;
     private const float bufferTime = 0.2f;
 
     // Variables
@@ -47,12 +47,22 @@ public class Player : MonoBehaviour
     private bool wantAttack = false;
     private Vector2 attackDirection = Vector2.zero;
 
+    public float AimingTime
+    {
+        get
+        {
+            return tagPlayer.AimingTime;
+        }
+    }
+
     private void Awake()
     {
         enabled = false;
     }
-    public void Init()
+    public void Init(TagPlayer tagPlayer, StateManager stateManager, AnimationManager animationManager)
     {
+        this.tagPlayer = tagPlayer;
+
         playerInput = GetComponent<PlayerInput>();
         playerInput.actions["Dash"].started += OnDashStarted;
         playerInput.actions["Dash"].canceled += OnDashCanceled;
@@ -65,12 +75,11 @@ public class Player : MonoBehaviour
         dashAbility = GetComponent<DashAbility>();
         activeWeapon = GetComponent<ActiveWeapon>();
         attackAbility = GetComponent<AttackAbility>();
-        animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
 
-        sM = new StateManager(States.Idle);
-        aM = new AnimationManager(animator, sM);
+        sM = stateManager;
+        aM = animationManager;
 
         circleTimer.timerEnded += TimerEnd;
 
@@ -279,7 +288,7 @@ public class Player : MonoBehaviour
         timeSlowAbility.IsActive = true;
 
         look.SetActive(true);
-        circleTimer.StartTimer(aimingTime);
+        circleTimer.StartTimer(AimingTime);
     }
 
     private void TimerEnd(object o, EventArgs e)

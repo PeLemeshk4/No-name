@@ -7,8 +7,8 @@ public class JumpAbility : MonoBehaviour
     private TagJump tagJump;
 
     // Parameters
-    private float noDoubleJumpTime = 0.1f;
-    private float coyoteTime = 0.15f;
+    private const float noDoubleJumpTime = 0.1f;
+    private const float coyoteTime = 0.15f;
 
     // Variables
     private bool onGround = false;

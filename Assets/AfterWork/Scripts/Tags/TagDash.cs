@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 [Serializable]
 public class TagDash : EntityComponentDefinition
@@ -9,4 +8,5 @@ public class TagDash : EntityComponentDefinition
     public float MaxSlowing;
     public float Cost;
     public float BouncePower;
+    public float SlowingParameter;
 }

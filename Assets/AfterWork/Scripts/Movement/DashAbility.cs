@@ -54,6 +54,13 @@ public class DashAbility : MonoBehaviour
             return tagDash.BouncePower;
         }
     }
+    public float SlowingParameter
+    {
+        get
+        {
+            return tagDash.SlowingParameter;
+        }
+    }
 
     private void Awake()
     {
@@ -108,7 +115,7 @@ public class DashAbility : MonoBehaviour
     {
         if (dashDistance >= realLength) return MaxSlowing;
 
-        float delta = Mathf.Pow(0.2f, Distribute(0, realLength, 0, 3, realLength - dashDistance));
+        float delta = Mathf.Pow(SlowingParameter, Distribute(0, realLength, 0, 3, realLength - dashDistance));
         float resistance = delta;
 
         return resistance > MaxSlowing ? MaxSlowing : resistance;

@@ -46,6 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: CMS::CMSEntityPfb
   idCMS: CMS/Prefabs/Models/Entities/PlayerModel
   Components:
+  - rid: 3398455431666597962
   - rid: 106480307888456138
   - rid: 106480307888456140
   - rid: 106480307888456142
@@ -72,6 +73,7 @@ MonoBehaviour:
         MaxSlowing: 0.7
         Cost: 50
         BouncePower: 0.9
+        SlowingParameter: 0.2
     - rid: 106480307888456142
       type: {class: TagTimeSlow, ns: , asm: Assembly-CSharp}
       data:
@@ -91,3 +93,7 @@ MonoBehaviour:
       type: {class: TagWeapon, ns: , asm: Assembly-CSharp}
       data:
         Weapon: {fileID: -2707159767269811221, guid: 4e64aab59ce23384ab46afc4eb4b25e8, type: 3}
+    - rid: 3398455431666597962
+      type: {class: TagPlayer, ns: , asm: Assembly-CSharp}
+      data:
+        AimingTime: 1

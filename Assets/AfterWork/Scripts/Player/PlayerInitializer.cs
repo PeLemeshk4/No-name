@@ -15,13 +15,15 @@ public class PlayerInitializer : Initializer
     [SerializeField] private AttackAbility attackAbility;
     [SerializeField] private HealthController healthController;
     [SerializeField] private AttackHandler attackHandler;
+    [SerializeField] private Animator animator;
     [SerializeField] private Player player;
 
     [Header("NotAutoAdd")]
     [SerializeField] private CircleTimer circleTimer;
     [SerializeField] private GameObject look;
 
-    public PlayerActionTracker actionTracker;
+    public StateManager StateManager { get; private set; }
+    public AnimationManager AnimationManager {  get; private set; }
 
     public override void Init(CMSEntity model)
     {
@@ -36,6 +38,7 @@ public class PlayerInitializer : Initializer
         attackAbility = GetComponent<AttackAbility>();
         healthController = GetComponent<HealthController>();
         attackHandler = GetComponent<AttackHandler>();
+        animator = GetComponent<Animator>();
         player = GetComponent<Player>();
 
         moveAbility.Init(model.Get<TagSpeed>());
@@ -49,9 +52,10 @@ public class PlayerInitializer : Initializer
         healthController.Init(model.Get<TagHealth>());
         attackHandler.Init(look.GetComponent<LookAbility>(), healthController); //?
         circleTimer.Init();
-        player.Init();
 
-        actionTracker = new PlayerActionTracker(dashAbility, attackAbility);
-        actionTracker.StartTracking();
+        StateManager = new StateManager(States.Idle);
+        AnimationManager = new AnimationManager(animator, StateManager);
+
+        player.Init(model.Get<TagPlayer>(), StateManager, AnimationManager);
     }
 }

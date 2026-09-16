@@ -30,6 +30,10 @@ public class ActionDataUI : MonoBehaviour
 
     private void UpdateInterface()
     {
-        textMeshPro.text = actionTracker.DashCount.ToString() + " " + actionTracker.AttackCount.ToString();
+        textMeshPro.text = "Total Time: " + actionTracker.TotalTime.ToString() + "\n"
+            + "Dash Count: " + actionTracker.DashCount.ToString() + "\n"
+            + "Attack Count: " + actionTracker.AttackCount.ToString() + "\n"
+            + "Idle Time: " + actionTracker.IdleTime.ToString();
+
     }
 }
