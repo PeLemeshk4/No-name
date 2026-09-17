@@ -22,7 +22,7 @@ public class G : MonoBehaviour
     private SliderOfController staminaPlayerSlider;
     private ActionDataUI actionData;
 
-    private void Awake()
+    private void Start()
     {
         StartMainScene();
     }
