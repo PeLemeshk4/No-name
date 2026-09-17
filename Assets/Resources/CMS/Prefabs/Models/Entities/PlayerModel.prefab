@@ -81,7 +81,7 @@ MonoBehaviour:
     - rid: 106480307888456143
       type: {class: TagStamina, ns: , asm: Assembly-CSharp}
       data:
-        IsEndless: 1
+        IsEndless: 0
         MaxValue: 100
         RegenRate: 10
     - rid: 106480307888456144
