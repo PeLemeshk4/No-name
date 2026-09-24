@@ -60,7 +60,7 @@ MonoBehaviour:
     - rid: 106480307888456138
       type: {class: TagSpeed, ns: , asm: Assembly-CSharp}
       data:
-        Speed: 5
+        Speed: 8
     - rid: 106480307888456140
       type: {class: TagJump, ns: , asm: Assembly-CSharp}
       data:
@@ -96,4 +96,4 @@ MonoBehaviour:
     - rid: 3398455431666597962
       type: {class: TagPlayer, ns: , asm: Assembly-CSharp}
       data:
-        AimingTime: 1
+        AimingTime: 0.5

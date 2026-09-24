@@ -25,7 +25,6 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject look;
 
     private StateManager sM;
-    private AnimationManager aM;
 
     // Parameters
     private const float quickActionTime = 0.15f;
@@ -59,7 +58,7 @@ public class Player : MonoBehaviour
     {
         enabled = false;
     }
-    public void Init(TagPlayer tagPlayer, StateManager stateManager, AnimationManager animationManager)
+    public void Init(TagPlayer tagPlayer, AttackAbility attackAbility, StateManager stateManager, AnimationManager animationManager)
     {
         this.tagPlayer = tagPlayer;
 
@@ -74,12 +73,11 @@ public class Player : MonoBehaviour
         timeSlowAbility = GetComponent<TimeSlowAbility>();
         dashAbility = GetComponent<DashAbility>();
         activeWeapon = GetComponent<ActiveWeapon>();
-        attackAbility = GetComponent<AttackAbility>();
+        this.attackAbility = attackAbility;
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
 
         sM = stateManager;
-        aM = animationManager;
 
         circleTimer.timerEnded += TimerEnd;
 

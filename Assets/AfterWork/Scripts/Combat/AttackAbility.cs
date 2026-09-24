@@ -1,19 +1,9 @@
 using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-public class AttackAbility : MonoBehaviour
+public class AttackAbility
 {
     public event EventHandler<EventArgs> IsAttacked;
-
-    private void Awake()
-    {
-        enabled = false;
-    }
-    public void Init()
-    {
-        enabled = true;
-    }
 
     public bool Attack(Weapon weapon, Vector2 direction)
     {

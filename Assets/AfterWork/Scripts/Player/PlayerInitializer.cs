@@ -12,7 +12,6 @@ public class PlayerInitializer : Initializer
     [SerializeField] private DashAbility dashAbility;
     [SerializeField] private PlayerVelocityManager vM;
     [SerializeField] private ActiveWeapon activeWeapon;
-    [SerializeField] private AttackAbility attackAbility;
     [SerializeField] private HealthController healthController;
     [SerializeField] private AttackHandler attackHandler;
     [SerializeField] private Animator animator;
@@ -22,6 +21,7 @@ public class PlayerInitializer : Initializer
     [SerializeField] private CircleTimer circleTimer;
     [SerializeField] private GameObject look;
 
+    public AttackAbility AttackAbility { get; private set; }
     public StateManager StateManager { get; private set; }
     public AnimationManager AnimationManager {  get; private set; }
 
@@ -35,7 +35,6 @@ public class PlayerInitializer : Initializer
         dashAbility = GetComponent<DashAbility>();
         vM = GetComponent<PlayerVelocityManager>();
         activeWeapon = GetComponent<ActiveWeapon>();
-        attackAbility = GetComponent<AttackAbility>();
         healthController = GetComponent<HealthController>();
         attackHandler = GetComponent<AttackHandler>();
         animator = GetComponent<Animator>();
@@ -48,7 +47,7 @@ public class PlayerInitializer : Initializer
         dashAbility.Init(model.Get<TagDash>(), staminaController, rb);
         vM.Init(rb, () => moveAbility.MoveVelocity, () => dashAbility.DashVelocity, () => dashAbility.BounceXVelocity);
         activeWeapon.Init(CMS.Get<CMSEntity>(model.Get<TagWeapon>().Weapon.GetId()));
-        attackAbility.Init();
+        AttackAbility = new AttackAbility();
         healthController.Init(model.Get<TagHealth>());
         attackHandler.Init(look.GetComponent<LookAbility>(), healthController); //?
         circleTimer.Init();
@@ -56,6 +55,6 @@ public class PlayerInitializer : Initializer
         StateManager = new StateManager(States.Idle);
         AnimationManager = new AnimationManager(animator, StateManager);
 
-        player.Init(model.Get<TagPlayer>(), StateManager, AnimationManager);
+        player.Init(model.Get<TagPlayer>(), AttackAbility, StateManager, AnimationManager);
     }
 }

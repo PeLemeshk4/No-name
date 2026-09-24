@@ -1,20 +1,22 @@
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class G : MonoBehaviour
 {
-    private MapGenerator mapGenerator;
-    private MapBuilder mapBuilder;
+    private CMSEntity playerModel;
+    private CMSEntity enemyModel;
 
     private GameObject playerPfb;
-    private GameObject enemyPfb;
+    [SerializeField] private GameObject enemyPfb;
+
+    private MapGenerator mapGenerator;
+    private MapBuilder mapBuilder;
+    private List<PlatformCoordinate> lowerPlatform;
+    private List<PlatformCoordinate> upperPlatform;
+    private List<int> enemySpotsCoordinates;
 
     private GameObject player;
     private Camera cam;
-
-    private CMSEntity playerModel;
-    private CMSEntity enemyModel;
 
     private PlayerActionTracker playerActionTracker;
 
@@ -33,7 +35,7 @@ public class G : MonoBehaviour
 
         playerPfb = Resources.Load<GameObject>("CMS/Prefabs/GameObjects/Player");
         playerModel = CMS.Get<CMSEntity>("CMS/Prefabs/Models/Entities/PlayerModel");
-        enemyPfb = Resources.Load<GameObject>("CMS/Prefabs/GameObjects/Enemy");
+        //enemyPfb = Resources.Load<GameObject>("CMS/Prefabs/GameObjects/Enemy");
         enemyModel = CMS.Get<CMSEntity>("CMS/Prefabs/Models/Entities/EnemyModel");
 
         cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
@@ -45,7 +47,8 @@ public class G : MonoBehaviour
 
         playerActionTracker = gameObject.AddComponent<PlayerActionTracker>();
         playerActionTracker.Init(player.GetComponent<DashAbility>(),
-            player.GetComponent<AttackAbility>(), player.GetComponent<PlayerInitializer>().StateManager);
+            player.GetComponent<PlayerInitializer>().AttackAbility,
+            player.GetComponent<PlayerInitializer>().StateManager);
         playerActionTracker.StartTracking();
 
         staminaPlayerSlider = GameObject.FindGameObjectWithTag("StaminaBar").GetComponent<SliderOfController>();
@@ -68,9 +71,12 @@ public class G : MonoBehaviour
         mapBuilder.Init();
 
         mapGenerator = new MapGenerator(playerModel, player.GetComponent<Rigidbody2D>(), cam);
-        mapGenerator.Generate();
+        lowerPlatform = mapGenerator.GeneratePlatform(30, 10, 20, 450);
+        upperPlatform = mapGenerator.GeneratePlatform(30, 10, 20, 450);
+        enemySpotsCoordinates = mapGenerator.GenerateEnemies(18, 0.7f, 450);
 
-        mapBuilder.BuildPlatforms(mapGenerator.LowerPLatformCoordinate, true);
-        mapBuilder.BuildPlatforms(mapGenerator.UpperPlatformCoordinate, false);
+        mapBuilder.BuildPlatforms(lowerPlatform, true);
+        mapBuilder.BuildPlatforms(upperPlatform, false);
+        mapBuilder.BuildEnemies(enemySpotsCoordinates, lowerPlatform, enemyPfb);
     }
 }

@@ -22,7 +22,6 @@ GameObject:
   - component: {fileID: 6638476860781490277}
   - component: {fileID: 1223849136772956556}
   - component: {fileID: 230590593942037467}
-  - component: {fileID: 6317761113704147863}
   - component: {fileID: 3226478667939891809}
   - component: {fileID: 4895352032585876293}
   - component: {fileID: 5868698468690423199}
@@ -202,7 +201,6 @@ MonoBehaviour:
   dashAbility: {fileID: 0}
   vM: {fileID: 0}
   activeWeapon: {fileID: 0}
-  attackAbility: {fileID: 0}
   healthController: {fileID: 0}
   attackHandler: {fileID: 0}
   animator: {fileID: 0}
@@ -337,18 +335,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcd0d36904d22024aae0f31a5996a0a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ActiveWeapon
---- !u!114 &6317761113704147863
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1823644327994091381}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c858cca0f45cce42a1ec7c561e45efb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AttackAbility
 --- !u!114 &3226478667939891809
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1896,6 +1896,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a209b6ff62302e74f8206e1efd27dd99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::G
+  enemyPfb: {fileID: 4320563574935854998, guid: 1ae7f2b5408bd6a44b85ced97f5eeb89, type: 3}
 --- !u!1 &1148304907
 GameObject:
   m_ObjectHideFlags: 0
@@ -2498,7 +2499,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aba466b91dad0af42a710e383901424d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraMove
-  speed: 1
+  speed: 2
   player: {fileID: 0}
 --- !u!1 &1638640899
 GameObject:

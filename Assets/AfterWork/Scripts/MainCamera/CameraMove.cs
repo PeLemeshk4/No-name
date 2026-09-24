@@ -18,8 +18,10 @@ public class CameraMove : MonoBehaviour
         enabled = true;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
+        //transform.position += new Vector3(speed * Time.fixedDeltaTime, 0, 0);
+
         if (player.position.x > transform.position.x + 3 || player.position.x < transform.position.x - 3)
         {
             Vector3 offset = new Vector3(player.position.x - transform.position.x, 0, 0) * speed * Time.deltaTime;

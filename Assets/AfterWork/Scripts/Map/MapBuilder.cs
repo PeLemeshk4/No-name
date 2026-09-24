@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -38,9 +37,9 @@ public class MapBuilder : MonoBehaviour
         enabled = true;
     }
 
-    public void BuildPlatforms(List<PlatformCoordinate> platformCoordinates, bool isBottomPlatform)
+    public void BuildPlatforms(List<PlatformCoordinate> platformsCoordinates, bool isBottomPlatform)
     {
-        foreach(PlatformCoordinate platformCoordinate in platformCoordinates)
+        foreach(PlatformCoordinate platformCoordinate in platformsCoordinates)
         {
             BuildPlatform(platformCoordinate, isBottomPlatform);
         }
@@ -50,9 +49,9 @@ public class MapBuilder : MonoBehaviour
     {
         if (isBottomPlatform)
         {
-            for (int x = platformCoordinate.X1; x < platformCoordinate.X2; x++)
+            for (int x = platformCoordinate.X1; x <= platformCoordinate.X2; x++)
             {
-                for (int y = 0; y < platformCoordinate.Y; y++)
+                for (int y = 0; y <= platformCoordinate.Y; y++)
                 {
                     Vector3Int position = new Vector3Int(x, y, 0);
                     lowerPlatform.SetTile(position, platformTile);
@@ -61,14 +60,31 @@ public class MapBuilder : MonoBehaviour
         }
         else
         {
-            for (int x = platformCoordinate.X1; x < platformCoordinate.X2; x++)
+            for (int x = platformCoordinate.X1; x <= platformCoordinate.X2; x++)
             {
-                for (int y = 0; y < platformCoordinate.Y; y++)
+                for (int y = 0; y <= platformCoordinate.Y; y++)
                 {
                     Vector3Int position = new Vector3Int(x, y, 0);
                     upperPlatform.SetTile(position, platformTile);
                 }
             }
+        }
+    }
+
+    public void BuildEnemies(List<int> enemiesCoordinates, List<PlatformCoordinate> platformsCoordinates, GameObject enemyPfb)
+    {
+        foreach (int x in enemiesCoordinates)
+        {
+            int i = 0;
+            while (x > platformsCoordinates[i].X2)
+            {
+                i++;
+                if (i > platformsCoordinates.Count - 1) break;
+            }
+
+            GameObject enemyObject = Instantiate(enemyPfb);
+            enemyObject.transform.parent = lowerPlatform.transform;
+            enemyObject.transform.localPosition = new Vector3(x, platformsCoordinates[i].Y + 2, 0);
         }
     }
 }

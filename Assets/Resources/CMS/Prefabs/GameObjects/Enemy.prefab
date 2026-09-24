@@ -18,9 +18,6 @@ GameObject:
   - component: {fileID: 244962869742763008}
   - component: {fileID: 2981387442873960169}
   - component: {fileID: 9170475038011337953}
-  - component: {fileID: 2281449866221616322}
-  - component: {fileID: 1047099202290358713}
-  - component: {fileID: 7517727534740460280}
   - component: {fileID: 8394560148977744285}
   - component: {fileID: 7440975567765655256}
   m_Layer: 0
@@ -58,9 +55,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8c6e736cede5d547a77306a119bcafe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyInitializer
+  rb: {fileID: 0}
   moveAbility: {fileID: 0}
   lookAbility: {fileID: 0}
-  attackAbility: {fileID: 0}
   activeWeapon: {fileID: 0}
   healthController: {fileID: 0}
   attackHandler: {fileID: 0}
@@ -214,7 +211,6 @@ MonoBehaviour:
   detector: {fileID: 5238725460870316904}
   lookAbility: {fileID: 2636288560362635280}
   activeWeapon: {fileID: 8394560148977744285}
-  attackAbility: {fileID: 1047099202290358713}
   healthController: {fileID: 0}
   attackHandler: {fileID: 2981387442873960169}
   animator: {fileID: 0}
@@ -267,44 +263,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fe462bec826f5944ae5d6a9ec8db5aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoveAbility
---- !u!114 &2281449866221616322
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4472824189864787207}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5e40256023fcfb43b9306c3940c596d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MovementSystem
-  rb: {fileID: 0}
---- !u!114 &1047099202290358713
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4472824189864787207}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c858cca0f45cce42a1ec7c561e45efb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AttackAbility
---- !u!114 &7517727534740460280
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4472824189864787207}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08f650bb4d7dfac48a42deabe6c36c5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CombatSystem
-  movementSystem: {fileID: 2281449866221616322}
 --- !u!114 &8394560148977744285
 MonoBehaviour:
   m_ObjectHideFlags: 0
