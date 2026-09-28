@@ -31,7 +31,7 @@ public class EnemyInitializer : Initializer
         attackAbility.Init();
         activeWeapon.Init(CMS.Get<CMSEntity>(model.Get<TagWeapon>().Weapon.GetId()));
         healthController.Init(model.Get<TagHealth>());
-        attackHandler.Init(lookAbility, healthController);
+        attackHandler.Init(lookAbility, healthController, null);
         enemyAI.Init();
     }
 }

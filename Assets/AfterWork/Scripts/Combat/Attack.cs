@@ -15,9 +15,10 @@ public class AttackHitEventsArgs : EventArgs
     }
 }
 
-public class Attack : MonoBehaviour
+public class Attack : MonoBehaviour, IParryable
 {
     public event EventHandler<AttackHitEventsArgs> AttackHit;
+    public event EventHandler Parried;
 
     private Collider2D attackCollider;
     private float damage = 0;
@@ -32,6 +33,16 @@ public class Attack : MonoBehaviour
         {
             damage = value;
         }
+    }
+
+    public bool CanBeParried => true;
+
+    public void OnParried(ParryContext context)
+    {
+        enabled = false;
+        if (attackCollider != null) attackCollider.enabled = false;
+
+        Parried?.Invoke(this, EventArgs.Empty);
     }
 
     private void Awake()
@@ -61,9 +72,11 @@ public class Attack : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject == gameObject) return;
+        if (!enabled) return;
+
         if (collision.gameObject.TryGetComponent<AttackHandler>(out AttackHandler attackHandler))
         {
-            attackHandler.TryProcessAttack(damage, transform);
+            attackHandler.TryProcessAttack(damage, transform, this);
             AttackHit?.Invoke(this, new AttackHitEventsArgs(collision.gameObject));
         }
     }

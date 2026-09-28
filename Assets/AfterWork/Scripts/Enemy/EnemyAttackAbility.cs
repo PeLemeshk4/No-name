@@ -47,14 +47,17 @@ public class EnemyAttackAbility : MonoBehaviour
 
     public void Attack(Transform target)
     {
-        isAttacking = true;
+        //isAttacking = true;
 
+        //if ((transform.position - target.position).magnitude > attackRange) return;
+
+        //if (target.TryGetComponent<AttackHandler>(out AttackHandler handler))
+        //{
+        //    handler.TryProcessAttack(damage, transform, attack);
+        //}
         if ((transform.position - target.position).magnitude > attackRange) return;
-
-        if (target.TryGetComponent<AttackHandler>(out AttackHandler handler))
-        {
-            handler.TryProcessAttack(damage, transform);
-        }
+        isAttacking = true;
+        attackTime = 0f;
     }
 
     private void OnAttackHit(object o, AttackHitEventsArgs e)

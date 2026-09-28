@@ -14,6 +14,7 @@ public class PlayerInitializer : Initializer
     [SerializeField] private ActiveWeapon activeWeapon;
     [SerializeField] private AttackAbility attackAbility;
     [SerializeField] private HealthController healthController;
+    [SerializeField] private ParryAbility parryAbility;
     [SerializeField] private AttackHandler attackHandler;
     [SerializeField] private Animator animator;
     [SerializeField] private Player player;
@@ -37,6 +38,7 @@ public class PlayerInitializer : Initializer
         activeWeapon = GetComponent<ActiveWeapon>();
         attackAbility = GetComponent<AttackAbility>();
         healthController = GetComponent<HealthController>();
+        parryAbility = GetComponent<ParryAbility>();
         attackHandler = GetComponent<AttackHandler>();
         animator = GetComponent<Animator>();
         player = GetComponent<Player>();
@@ -50,7 +52,7 @@ public class PlayerInitializer : Initializer
         activeWeapon.Init(CMS.Get<CMSEntity>(model.Get<TagWeapon>().Weapon.GetId()));
         attackAbility.Init();
         healthController.Init(model.Get<TagHealth>());
-        attackHandler.Init(look.GetComponent<LookAbility>(), healthController); //?
+        attackHandler.Init(look.GetComponent<LookAbility>(), healthController, parryAbility);
         circleTimer.Init();
 
         StateManager = new StateManager(States.Idle);

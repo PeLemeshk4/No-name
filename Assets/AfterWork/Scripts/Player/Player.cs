@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
     private AttackAbility attackAbility;
     private Rigidbody2D rb;
     private SpriteRenderer sr;
+    private ParryAbility parryAbility;
     [SerializeField] private CircleTimer circleTimer;
     [SerializeField] private GameObject look;
 
@@ -68,6 +69,7 @@ public class Player : MonoBehaviour
         playerInput.actions["Dash"].canceled += OnDashCanceled;
         playerInput.actions["Attack"].canceled += OnAttackCanceled;
         playerInput.actions["Attack"].started += OnAttackStarted;
+        playerInput.actions["Parry"].started += (ctx) => Debug.Log("Parry pressed!");
 
         moveAbility = GetComponent<MoveAbility>();
         jumpAbility = GetComponent<JumpAbility>();
@@ -77,6 +79,10 @@ public class Player : MonoBehaviour
         attackAbility = GetComponent<AttackAbility>();
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
+
+        parryAbility = GetComponent<ParryAbility>();
+        parryAbility.ParryEnded += OnParryEnded;
+        playerInput.actions["Parry"].started += OnParryStarted;
 
         sM = stateManager;
         aM = animationManager;
@@ -308,5 +314,22 @@ public class Player : MonoBehaviour
             wantAttack = true;
             attackDirection = lookDirection;
         }
+    }
+
+    private void OnParryStarted(InputAction.CallbackContext context)
+    {
+        if (aiming || sM.IsStateLocked()) return;
+
+        if (parryAbility.TryStartParry())
+        {
+            sM.SetState(States.Parry);
+            moveAbility.Direction = 0;
+        }
+    }
+
+    private void OnParryEnded()
+    {
+        if (sM.CurrentState == States.Parry)
+            sM.SetState(States.Idle);
     }
 }

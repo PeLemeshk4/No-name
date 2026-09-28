@@ -9,7 +9,8 @@ public enum States
     Fall,
     Dash,
     Attack,
-    Dead
+    Dead,
+    Parry
 }
 
 public class StateManager

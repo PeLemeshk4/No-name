@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class EnemyAttack : MonoBehaviour
+public class EnemyAttack : MonoBehaviour, IParryable
 {
     public event EventHandler<AttackHitEventsArgs> AttackHit;
 
@@ -18,6 +18,14 @@ public class EnemyAttack : MonoBehaviour
         {
             damage = value;
         }
+    }
+
+    public bool CanBeParried => true;
+
+    public void OnParried(ParryContext context)
+    {
+        enabled = false;
+        if (attackCollider != null) attackCollider.enabled = false;
     }
 
     private void Awake()
@@ -41,7 +49,7 @@ public class EnemyAttack : MonoBehaviour
         if (!collision.gameObject.CompareTag("Player")) return;
         if (collision.gameObject.TryGetComponent<AttackHandler>(out AttackHandler attackHandler))
         {
-            attackHandler.TryProcessAttack(damage, transform);
+            attackHandler.TryProcessAttack(damage, transform, this);
             AttackHit?.Invoke(this, new AttackHitEventsArgs(collision.gameObject));
         }
     }
