@@ -79,4 +79,17 @@ public class G : MonoBehaviour
         mapBuilder.BuildPlatforms(upperPlatform, false);
         mapBuilder.BuildEnemies(enemySpotsCoordinates, lowerPlatform, enemyPfb);
     }
+
+    // так добавл€етс€ тег (словарь не поддерживаетс€ в CMS) 
+    private void AddStatesAndVolumes()
+    {
+        playerModel.Define<TagStatesAndVolumes>().StatesAndVolumes = new Dictionary<States, float>
+        {
+            { States.Idle, 0 },
+            { States.Run, 5 },
+            { States.Attack, 7 },
+            { States.Jump, 5 },
+            { States.Fall, 5 }
+        };
+    }
 }

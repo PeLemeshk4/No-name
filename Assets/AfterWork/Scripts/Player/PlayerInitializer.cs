@@ -20,10 +20,12 @@ public class PlayerInitializer : Initializer
     [Header("NotAutoAdd")]
     [SerializeField] private CircleTimer circleTimer;
     [SerializeField] private GameObject look;
+    [SerializeField] private SoundMaker soundMaker;
 
     public AttackAbility AttackAbility { get; private set; }
     public StateManager StateManager { get; private set; }
     public AnimationManager AnimationManager {  get; private set; }
+    public SoundManager SoundManager { get; private set; }
 
     public override void Init(CMSEntity model)
     {
@@ -55,6 +57,19 @@ public class PlayerInitializer : Initializer
         StateManager = new StateManager(States.Idle);
         AnimationManager = new AnimationManager(animator, StateManager);
 
+        soundMaker.Init();
+        SoundManager = new SoundManager(model.Get<TagStatesAndVolumes>(), StateManager, soundMaker);
+
         player.Init(model.Get<TagPlayer>(), AttackAbility, StateManager, AnimationManager);
+    }
+
+    private void InitTagStatesAndVolumes(TagStatesAndVolumes tagSaV)
+    {
+        tagSaV = new TagStatesAndVolumes();
+        tagSaV.StatesAndVolumes.Add(States.Idle, 0);
+        tagSaV.StatesAndVolumes.Add(States.Run, 5);
+        tagSaV.StatesAndVolumes.Add(States.Attack, 7);
+        tagSaV.StatesAndVolumes.Add(States.Jump, 5);
+        tagSaV.StatesAndVolumes.Add(States.Fall, 5);
     }
 }
