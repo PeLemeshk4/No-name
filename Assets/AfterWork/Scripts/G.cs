@@ -40,6 +40,7 @@ public class G : MonoBehaviour
 
         cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 
+        AddStatesAndVolumes();
         player = Factory.Create(
             playerPfb,
             playerModel);
@@ -83,7 +84,7 @@ public class G : MonoBehaviour
     // так добавл€етс€ тег (словарь не поддерживаетс€ в CMS) 
     private void AddStatesAndVolumes()
     {
-        playerModel.Define<TagStatesAndVolumes>().StatesAndVolumes = new Dictionary<States, float>
+        playerModel.Get<TagStatesAndVolumes>().StatesAndVolumes = new Dictionary<States, float>
         {
             { States.Idle, 0 },
             { States.Run, 5 },

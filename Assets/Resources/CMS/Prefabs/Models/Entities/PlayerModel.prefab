@@ -54,6 +54,7 @@ MonoBehaviour:
   - rid: 106480307888456141
   - rid: 106480307888456144
   - rid: 106480307888456145
+  - rid: 2897782088590164056
   references:
     version: 2
     RefIds:
@@ -93,6 +94,9 @@ MonoBehaviour:
       type: {class: TagWeapon, ns: , asm: Assembly-CSharp}
       data:
         Weapon: {fileID: -2707159767269811221, guid: 4e64aab59ce23384ab46afc4eb4b25e8, type: 3}
+    - rid: 2897782088590164056
+      type: {class: TagStatesAndVolumes, ns: , asm: Assembly-CSharp}
+      data: 
     - rid: 3398455431666597962
       type: {class: TagPlayer, ns: , asm: Assembly-CSharp}
       data:

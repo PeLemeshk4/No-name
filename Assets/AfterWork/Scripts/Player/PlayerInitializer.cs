@@ -14,6 +14,7 @@ public class PlayerInitializer : Initializer
     [SerializeField] private ActiveWeapon activeWeapon;
     [SerializeField] private HealthController healthController;
     [SerializeField] private AttackHandler attackHandler;
+    [SerializeField] private EffectHandler effectHandler;
     [SerializeField] private Animator animator;
     [SerializeField] private Player player;
 
@@ -39,6 +40,7 @@ public class PlayerInitializer : Initializer
         activeWeapon = GetComponent<ActiveWeapon>();
         healthController = GetComponent<HealthController>();
         attackHandler = GetComponent<AttackHandler>();
+        effectHandler = GetComponent<EffectHandler>();
         animator = GetComponent<Animator>();
         player = GetComponent<Player>();
 
@@ -52,6 +54,7 @@ public class PlayerInitializer : Initializer
         AttackAbility = new AttackAbility();
         healthController.Init(model.Get<TagHealth>());
         attackHandler.Init(look.GetComponent<LookAbility>(), healthController); //?
+        effectHandler.Init();
         circleTimer.Init();
 
         StateManager = new StateManager(States.Idle);
@@ -61,15 +64,5 @@ public class PlayerInitializer : Initializer
         SoundManager = new SoundManager(model.Get<TagStatesAndVolumes>(), StateManager, soundMaker);
 
         player.Init(model.Get<TagPlayer>(), AttackAbility, StateManager, AnimationManager);
-    }
-
-    private void InitTagStatesAndVolumes(TagStatesAndVolumes tagSaV)
-    {
-        tagSaV = new TagStatesAndVolumes();
-        tagSaV.StatesAndVolumes.Add(States.Idle, 0);
-        tagSaV.StatesAndVolumes.Add(States.Run, 5);
-        tagSaV.StatesAndVolumes.Add(States.Attack, 7);
-        tagSaV.StatesAndVolumes.Add(States.Jump, 5);
-        tagSaV.StatesAndVolumes.Add(States.Fall, 5);
     }
 }
