@@ -49,7 +49,7 @@ public class PlayerInitializer : Initializer
         timeSlowAbility.Init(model.Get<TagTimeSlow>());
         staminaController.Init(model.Get<TagStamina>());
         dashAbility.Init(model.Get<TagDash>(), staminaController, rb);
-        vM.Init(rb, () => moveAbility.MoveVelocity, () => dashAbility.DashVelocity, () => dashAbility.BounceXVelocity);
+        vM.Init(rb, () => moveAbility.MoveVelocity, () => dashAbility.DashVelocity, () => dashAbility.BounceXVelocity, () => jumpAbility.NotOnGround);
         activeWeapon.Init(CMS.Get<CMSEntity>(model.Get<TagWeapon>().Weapon.GetId()));
         AttackAbility = new AttackAbility();
         healthController.Init(model.Get<TagHealth>());
