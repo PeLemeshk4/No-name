@@ -1,12 +1,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum TypeEnemy
+{
+    Melee,
+    Range
+}
+
+public class MapFloor
+{
+    public List<PlatformCoordinate> platforms;
+    public List<List<(TypeEnemy, Vector2Int)>> enemies;
+    public List<List<Vector2Int>> puddles;
+
+    public MapFloor()
+    {
+        platforms = new List<PlatformCoordinate>();
+        enemies = new List<List<(TypeEnemy, Vector2Int)>>();
+        puddles = new List<List<Vector2Int>>();
+    }
+}
+
 public class MapGenerator
 {
-    [SerializeField] private float maxPercentOffset = 70;
-
-    private List<Vector2Int> downFloor = new List<Vector2Int>() { new Vector2Int(0, 0) };
-
     private int safePlatformLength = 30;
     private int maxOffset;
 
@@ -22,18 +38,20 @@ public class MapGenerator
     }
     PlayerParameters parameters = new PlayerParameters();
 
-    public MapGenerator(CMSEntity playerModel, Rigidbody2D rb, Camera cam)
+    public MapGenerator(CMSEntity playerModel, Rigidbody2D rb, Camera cam, float maxPercentOffset)
     {
-        parameters.g = rb.gravityScale * Physics2D.gravity.y;
-        parameters.m = rb.mass;
-        parameters.jumpPower = playerModel.Get<TagJump>().Power;
-        parameters.jumpTime = Mathf.Abs(parameters.jumpPower / (parameters.m * parameters.g));
-        parameters.jumpHeight = ((parameters.jumpPower / parameters.m) * parameters.jumpTime) 
-            + (parameters.g * (parameters.jumpTime * parameters.jumpTime)) / 2;
-        parameters.speed = playerModel.Get<TagSpeed>().Speed;
-        parameters.dashLength = playerModel.Get<TagDash>().Length;
         maxOffset = (int)(cam.orthographicSize * maxPercentOffset / 100.0f);  
     }
+
+    private MapFloor GenerateMapFloor()
+    {
+        MapFloor floor = new MapFloor();
+
+
+        return floor;
+    }
+
+    private void 
 
     public List<PlatformCoordinate> GeneratePlatform(int count, int minLength, int maxLength, int totalLength)
     {
@@ -48,7 +66,6 @@ public class MapGenerator
 
         for (int i = 0; i < count - 1; i++)
         {
-            //Vector2Int nextPoint = GetRandomPossibilityPoint(newPlatform[i].X2, newPlatform[i].Y);
             Vector2Int nextPoint = new Vector2Int(newPlatform[i].X2 + 1, Random.Range(0, maxOffset));
 
             (int, int) newLength = GetNewLength(minLength, maxLength, remainCount, remainLength);
@@ -167,27 +184,5 @@ public class MapGenerator
         }
 
         return enemySpotsNumbers;
-    }
-
-    private Vector2Int GetRandomPossibilityPoint(int x, int y)
-    {
-        float yPossibility = parameters.jumpHeight + parameters.dashLength;
-        float maxDY = Mathf.Min(yPossibility, maxOffset - y);
-        int dy = (int)Random.Range(-y, maxDY);
-        float maxDX;
-        if (dy > parameters.jumpHeight)
-        {
-            maxDX = Mathf.Sqrt((dy - parameters.jumpHeight - parameters.dashLength) *
-            2 * (parameters.speed * parameters.speed) / parameters.g) + (parameters.speed * parameters.jumpTime);
-        }
-        else
-        {
-            maxDX = Mathf.Sqrt((dy - parameters.jumpHeight) *
-            2 * (parameters.speed * parameters.speed) / parameters.g) + (parameters.speed * parameters.jumpTime) + parameters.dashLength;
-        }
-
-        int dx = (int)Random.Range(0, maxDX);
-
-        return new Vector2Int(x + dx, y + dy);
     }
 }

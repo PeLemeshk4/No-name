@@ -71,7 +71,7 @@ public class G : MonoBehaviour
         mapBuilder = GameObject.FindGameObjectWithTag("Map").GetComponent<MapBuilder>();
         mapBuilder.Init();
 
-        mapGenerator = new MapGenerator(playerModel, player.GetComponent<Rigidbody2D>(), cam);
+        mapGenerator = new MapGenerator(playerModel, player.GetComponent<Rigidbody2D>(), cam, 0.7f);
         lowerPlatform = mapGenerator.GeneratePlatform(30, 10, 20, 450);
         upperPlatform = mapGenerator.GeneratePlatform(30, 10, 20, 450);
         enemySpotsCoordinates = mapGenerator.GenerateEnemies(18, 0.7f, 450);
