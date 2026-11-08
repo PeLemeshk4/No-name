@@ -9,15 +9,33 @@ public enum TypeEnemy
 
 public class MapFloor
 {
-    public List<PlatformCoordinate> platforms;
-    public List<List<(TypeEnemy, Vector2Int)>> enemies;
-    public List<List<Vector2Int>> puddles;
+    private int platformCount = 0;
+    private List<PlatformCoordinate> platforms;
+    private List<List<(TypeEnemy, Vector2Int)>> enemies;
+    private List<List<Vector2Int>> puddles;
+
+    public int PlatformCount { get { return platformCount; } }
+    public List<PlatformCoordinate> Platforms { get { return platforms; } }
+    public List<List<(TypeEnemy, Vector2Int)>> Enemies { get { return enemies; } }
+    public List<List<Vector2Int>> Puddles { get { return puddles; } }
 
     public MapFloor()
     {
         platforms = new List<PlatformCoordinate>();
         enemies = new List<List<(TypeEnemy, Vector2Int)>>();
         puddles = new List<List<Vector2Int>>();
+    }
+
+    public bool AddPlatform(PlatformCoordinate coordinate)
+    {
+        if (coordinate.X2 < coordinate.X1) return false;
+        if (coordinate.X1 != platforms[platforms.Count - 1].X2 + 1) return false;
+
+        platforms.Add(coordinate);
+        enemies.Add(new List<(TypeEnemy, Vector2Int)>());
+        puddles.Add(new List<Vector2Int>());
+        platformCount++;
+        return true;
     }
 }
 
@@ -26,58 +44,56 @@ public class MapGenerator
     private int safePlatformLength = 30;
     private int maxOffset;
 
-    struct PlayerParameters
-    {
-        public float g;
-        public float m;
-        public float jumpPower;
-        public float jumpTime;
-        public float jumpHeight;
-        public float speed;
-        public float dashLength;      
-    }
-    PlayerParameters parameters = new PlayerParameters();
-
     public MapGenerator(CMSEntity playerModel, Rigidbody2D rb, Camera cam, float maxPercentOffset)
     {
         maxOffset = (int)(cam.orthographicSize * maxPercentOffset / 100.0f);  
     }
 
-    private MapFloor GenerateMapFloor()
+    public MapFloor GenerateMapFloor(CMSEntity mapModel)
     {
         MapFloor floor = new MapFloor();
+
+        TagMapPlatforms tagMP = mapModel.Get<TagMapPlatforms>();
+        GeneratePlatforms(floor, tagMP.Count, tagMP.MinLength, tagMP.MaxLength, tagMP.TotalLength);
 
 
         return floor;
     }
 
-    private void 
-
-    public List<PlatformCoordinate> GeneratePlatform(int count, int minLength, int maxLength, int totalLength)
+    public void GeneratePlatforms(MapFloor floor, int count, int minLength, int maxLength, int totalLength)
     {
+        List<PlatformCoordinate> platforms = floor.Platforms;
+        int platformCount = floor.PlatformCount;
+
         int remainCount = count;
         int remainLength = totalLength;
 
-        List<PlatformCoordinate> newPlatform = new List<PlatformCoordinate>();
-
-        newPlatform.Add(GetPlatformCoordinate(0, safePlatformLength - 1, 1));
-        remainCount--;
-        remainLength -= safePlatformLength;
-
-        for (int i = 0; i < count - 1; i++)
+        if (platformCount == 0)
         {
-            Vector2Int nextPoint = new Vector2Int(newPlatform[i].X2 + 1, Random.Range(0, maxOffset));
-
-            (int, int) newLength = GetNewLength(minLength, maxLength, remainCount, remainLength);
-            int platformLength = Random.Range(newLength.Item1, newLength.Item2);
-            newPlatform.Add(GetPlatformCoordinate(nextPoint.x, nextPoint.x + platformLength - 1, nextPoint.y));
+            (int, int) minMaxLength = GetMinMaxLength(minLength, maxLength, remainCount, remainLength);
+            int platformLength = Random.Range(minMaxLength.Item1, minMaxLength.Item2);
+            int x1 = 0;
+            int x2 = platformLength - 1;
+            int y = Random.Range(0, maxOffset);
+            floor.AddPlatform(GetPlatformCoordinate(x1, x2, y));
             remainCount--;
             remainLength -= platformLength;
         }
-        return newPlatform;
+
+        for (int i = platformCount - 1; i < platformCount + count - 1; i++)
+        {
+            (int, int) minMaxLength = GetMinMaxLength(minLength, maxLength, remainCount, remainLength);
+            int platformLength = Random.Range(minMaxLength.Item1, minMaxLength.Item2);
+            int x1 = platforms[i].X2 + 1;
+            int x2 = platforms[i].X2 + platformLength;
+            int y = Random.Range(0, maxOffset);
+            floor.AddPlatform(GetPlatformCoordinate(x1, x2, y));
+            remainCount--;
+            remainLength -= platformLength;
+        }
     }
 
-    private (int, int) GetNewLength(int minLength, int maxLength, int count, int totalLength)
+    private (int, int) GetMinMaxLength(int minLength, int maxLength, int count, int totalLength)
     {
         if (count == 1)
         {

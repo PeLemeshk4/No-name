@@ -5,6 +5,7 @@ public class G : MonoBehaviour
 {
     private CMSEntity playerModel;
     private CMSEntity enemyModel;
+    private CMSEntity mapModel;
 
     private GameObject playerPfb;
     [SerializeField] private GameObject enemyPfb;
@@ -37,6 +38,7 @@ public class G : MonoBehaviour
         playerModel = CMS.Get<CMSEntity>("CMS/Prefabs/Models/Entities/PlayerModel");
         //enemyPfb = Resources.Load<GameObject>("CMS/Prefabs/GameObjects/Enemy");
         enemyModel = CMS.Get<CMSEntity>("CMS/Prefabs/Models/Entities/EnemyModel");
+        mapModel = CMS.Get<CMSEntity>("CMS/Prefabs/Models/MapModel");
 
         cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 
@@ -62,18 +64,19 @@ public class G : MonoBehaviour
         CameraMove camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMove>();
         camera.Init(player.transform);
 
-        CreateMap();
+        CreateMap(mapModel);
 
     }
 
-    private void CreateMap()
+    private void CreateMap(CMSEntity mapModel)
     {
         mapBuilder = GameObject.FindGameObjectWithTag("Map").GetComponent<MapBuilder>();
         mapBuilder.Init();
 
         mapGenerator = new MapGenerator(playerModel, player.GetComponent<Rigidbody2D>(), cam, 0.7f);
-        lowerPlatform = mapGenerator.GeneratePlatform(30, 10, 20, 450);
-        upperPlatform = mapGenerator.GeneratePlatform(30, 10, 20, 450);
+        MapFloor floor = new MapFloor();
+        lowerPlatform = new List<PlatformCoordinate>();
+        upperPlatform = new List<PlatformCoordinate>();
         enemySpotsCoordinates = mapGenerator.GenerateEnemies(18, 0.7f, 450);
 
         mapBuilder.BuildPlatforms(lowerPlatform, true);
