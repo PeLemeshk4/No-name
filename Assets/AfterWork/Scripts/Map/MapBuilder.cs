@@ -4,9 +4,20 @@ using UnityEngine.Tilemaps;
 
 public struct PlatformCoordinate
 {
-    public int X1;
-    public int X2;
-    public int Y;
+    private int x1;
+    private int x2;
+    private int y;
+
+    public int X1 { get { return x1; } }
+    public int X2 { get { return x2; } }
+    public int Y { get { return y; } }
+
+    public PlatformCoordinate(int x1, int x2, int y)
+    {
+        this.x1 = x1;
+        this.x2 = x2;
+        this.y = y;
+    }
 }
 
 public class MapBuilder : MonoBehaviour
@@ -37,11 +48,17 @@ public class MapBuilder : MonoBehaviour
         enabled = true;
     }
 
-    public void BuildPlatforms(List<PlatformCoordinate> platformsCoordinates, bool isBottomPlatform)
+    public void BuildFloor(MapFloor floor, bool isBottom, GameObject enemyPfb)
     {
-        foreach(PlatformCoordinate platformCoordinate in platformsCoordinates)
+        BuildPlatforms(floor, isBottom);
+        BuildEnemies(floor, enemyPfb);
+    }
+
+    public void BuildPlatforms(MapFloor floor, bool isBottom)
+    {
+        foreach(PlatformCoordinate platformCoordinate in floor.Platforms)
         {
-            BuildPlatform(platformCoordinate, isBottomPlatform);
+            BuildPlatform(platformCoordinate, isBottom);
         }
     }
 
@@ -49,7 +66,7 @@ public class MapBuilder : MonoBehaviour
     {
         if (isBottomPlatform)
         {
-            for (int x = platformCoordinate.X1; x <= platformCoordinate.X2; x++)
+            for (int x = platformCoordinate.X1; x < platformCoordinate.X2; x++)
             {
                 for (int y = 0; y <= platformCoordinate.Y; y++)
                 {
@@ -60,7 +77,7 @@ public class MapBuilder : MonoBehaviour
         }
         else
         {
-            for (int x = platformCoordinate.X1; x <= platformCoordinate.X2; x++)
+            for (int x = platformCoordinate.X1; x < platformCoordinate.X2; x++)
             {
                 for (int y = 0; y <= platformCoordinate.Y; y++)
                 {
@@ -71,20 +88,16 @@ public class MapBuilder : MonoBehaviour
         }
     }
 
-    public void BuildEnemies(List<int> enemiesCoordinates, List<PlatformCoordinate> platformsCoordinates, GameObject enemyPfb)
+    public void BuildEnemies(MapFloor floor, GameObject enemyPfb)
     {
-        foreach (int x in enemiesCoordinates)
+        foreach (int i in floor.EnemiesNumbers)
         {
-            int i = 0;
-            while (x > platformsCoordinates[i].X2)
+            foreach ((TypeEnemy, int) enemyData in floor.Enemies[i])
             {
-                i++;
-                if (i > platformsCoordinates.Count - 1) break;
+                GameObject enemyObject = Instantiate(enemyPfb);
+                enemyObject.transform.parent = lowerPlatform.transform;
+                enemyObject.transform.localPosition = new Vector3(enemyData.Item2, floor.Platforms[i].Y + 2, 0);
             }
-
-            GameObject enemyObject = Instantiate(enemyPfb);
-            enemyObject.transform.parent = lowerPlatform.transform;
-            enemyObject.transform.localPosition = new Vector3(x, platformsCoordinates[i].Y + 2, 0);
         }
     }
 }

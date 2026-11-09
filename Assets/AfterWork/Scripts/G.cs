@@ -12,9 +12,8 @@ public class G : MonoBehaviour
 
     private MapGenerator mapGenerator;
     private MapBuilder mapBuilder;
-    private List<PlatformCoordinate> lowerPlatform;
-    private List<PlatformCoordinate> upperPlatform;
-    private List<int> enemySpotsCoordinates;
+    private MapFloor lowerFloor;
+    private MapFloor upperFloor;
 
     private GameObject player;
     private Camera cam;
@@ -73,18 +72,15 @@ public class G : MonoBehaviour
         mapBuilder = GameObject.FindGameObjectWithTag("Map").GetComponent<MapBuilder>();
         mapBuilder.Init();
 
-        mapGenerator = new MapGenerator(playerModel, player.GetComponent<Rigidbody2D>(), cam, 0.7f);
-        MapFloor floor = new MapFloor();
-        lowerPlatform = new List<PlatformCoordinate>();
-        upperPlatform = new List<PlatformCoordinate>();
-        enemySpotsCoordinates = mapGenerator.GenerateEnemies(18, 0.7f, 450);
+        mapGenerator = new MapGenerator(playerModel, cam, 0.7f);
+        lowerFloor = mapGenerator.GenerateMapFloor(mapModel);
+        upperFloor = mapGenerator.GenerateMapFloor(mapModel, enemies:false);
 
-        mapBuilder.BuildPlatforms(lowerPlatform, true);
-        mapBuilder.BuildPlatforms(upperPlatform, false);
-        mapBuilder.BuildEnemies(enemySpotsCoordinates, lowerPlatform, enemyPfb);
+        mapBuilder.BuildFloor(lowerFloor, true, enemyPfb);
+        mapBuilder.BuildFloor(upperFloor, false, enemyPfb);
     }
 
-    // так добавляется тег (словарь не поддерживается в CMS) 
+    // Добавление тэга (словарь не поддерживается в этом CMS) 
     private void AddStatesAndVolumes()
     {
         playerModel.Get<TagStatesAndVolumes>().StatesAndVolumes = new Dictionary<States, float>

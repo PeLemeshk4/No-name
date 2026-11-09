@@ -9,53 +9,94 @@ public enum TypeEnemy
 
 public class MapFloor
 {
+    private int length = 0;
+    private int maxY = 0;
     private int platformCount = 0;
     private List<PlatformCoordinate> platforms;
-    private List<List<(TypeEnemy, Vector2Int)>> enemies;
+    private List<List<(TypeEnemy, int)>> enemies;
+    private HashSet<int> enemiesNumbers;
     private List<List<Vector2Int>> puddles;
 
+    public int Length { get { return length; } }
+    public int MaxY { get { return maxY;  } }
     public int PlatformCount { get { return platformCount; } }
     public List<PlatformCoordinate> Platforms { get { return platforms; } }
-    public List<List<(TypeEnemy, Vector2Int)>> Enemies { get { return enemies; } }
+    public List<List<(TypeEnemy, int)>> Enemies { get { return enemies; } }
+    public HashSet<int> EnemiesNumbers {  get { return enemiesNumbers; } }
     public List<List<Vector2Int>> Puddles { get { return puddles; } }
 
-    public MapFloor()
+    public MapFloor(int maxY)
     {
         platforms = new List<PlatformCoordinate>();
-        enemies = new List<List<(TypeEnemy, Vector2Int)>>();
+        enemies = new List<List<(TypeEnemy, int)>>();
+        enemiesNumbers = new HashSet<int>();
         puddles = new List<List<Vector2Int>>();
+        this.maxY = maxY;
     }
 
-    public bool AddPlatform(PlatformCoordinate coordinate)
+    public int GetIndexPlatform(int coordinate)
     {
-        if (coordinate.X2 < coordinate.X1) return false;
-        if (coordinate.X1 != platforms[platforms.Count - 1].X2 + 1) return false;
+        for (int i = 0; i < platformCount; i++)
+        {
+            if (coordinate >= platforms[i].X1 && coordinate < platforms[i].X2)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
 
+    public bool AddPlatform(int lengthPlatform, int y)
+    {
+        if (y > maxY) return false;
+        if (lengthPlatform < 1) return false;
+
+        int x1 = length;
+        int x2 = x1 + lengthPlatform;
+        PlatformCoordinate coordinate = new PlatformCoordinate(x1, x2, y);
         platforms.Add(coordinate);
-        enemies.Add(new List<(TypeEnemy, Vector2Int)>());
+        enemies.Add(new List<(TypeEnemy, int)>());
         puddles.Add(new List<Vector2Int>());
         platformCount++;
+        length = coordinate.X2;
+        return true;
+    }
+
+    public bool AddEnemy(TypeEnemy type, int platformNumber, int coordinate)
+    {
+        if (platformNumber >= platformCount) return false;
+        if (coordinate < platforms[platformNumber].X1
+            && coordinate > platforms[platformNumber].X2) return false;
+
+        enemies[platformNumber].Add((type, coordinate));
+        enemiesNumbers.Add(platformNumber);
         return true;
     }
 }
 
 public class MapGenerator
 {
-    private int safePlatformLength = 30;
     private int maxOffset;
 
-    public MapGenerator(CMSEntity playerModel, Rigidbody2D rb, Camera cam, float maxPercentOffset)
+    public MapGenerator(CMSEntity playerModel, Camera cam, float maxPercentOffset)
     {
-        maxOffset = (int)(cam.orthographicSize * maxPercentOffset / 100.0f);  
+        maxOffset = (int)(cam.orthographicSize * maxPercentOffset);
     }
 
-    public MapFloor GenerateMapFloor(CMSEntity mapModel)
+    public MapFloor GenerateMapFloor(CMSEntity mapModel, bool platforms = true, bool enemies = true)
     {
-        MapFloor floor = new MapFloor();
+        MapFloor floor = new MapFloor(maxOffset);
 
-        TagMapPlatforms tagMP = mapModel.Get<TagMapPlatforms>();
-        GeneratePlatforms(floor, tagMP.Count, tagMP.MinLength, tagMP.MaxLength, tagMP.TotalLength);
-
+        if (platforms)
+        {
+            TagMapPlatforms tagMP = mapModel.Get<TagMapPlatforms>();
+            GeneratePlatforms(floor, tagMP.Count, tagMP.MinLength, tagMP.MaxLength, tagMP.TotalLength);
+        }
+        if (enemies)
+        {
+            TagMapEnemies tagME = mapModel.Get<TagMapEnemies>();
+            GenerateEnemies(floor, tagME.PlacesCount, tagME.P);
+        }
 
         return floor;
     }
@@ -68,26 +109,12 @@ public class MapGenerator
         int remainCount = count;
         int remainLength = totalLength;
 
-        if (platformCount == 0)
+        for (int i = platformCount - 1; i < platformCount + count; i++)
         {
             (int, int) minMaxLength = GetMinMaxLength(minLength, maxLength, remainCount, remainLength);
             int platformLength = Random.Range(minMaxLength.Item1, minMaxLength.Item2);
-            int x1 = 0;
-            int x2 = platformLength - 1;
-            int y = Random.Range(0, maxOffset);
-            floor.AddPlatform(GetPlatformCoordinate(x1, x2, y));
-            remainCount--;
-            remainLength -= platformLength;
-        }
-
-        for (int i = platformCount - 1; i < platformCount + count - 1; i++)
-        {
-            (int, int) minMaxLength = GetMinMaxLength(minLength, maxLength, remainCount, remainLength);
-            int platformLength = Random.Range(minMaxLength.Item1, minMaxLength.Item2);
-            int x1 = platforms[i].X2 + 1;
-            int x2 = platforms[i].X2 + platformLength;
-            int y = Random.Range(0, maxOffset);
-            floor.AddPlatform(GetPlatformCoordinate(x1, x2, y));
+            int y = Random.Range(0, floor.MaxY);
+            floor.AddPlatform(platformLength, y);
             remainCount--;
             remainLength -= platformLength;
         }
@@ -123,19 +150,9 @@ public class MapGenerator
         return (newMinLength, newMaxLength);
     }
 
-    private PlatformCoordinate GetPlatformCoordinate(int x1, int x2, int y)
+    public void GenerateEnemies(MapFloor floor, int placesCount, float p)
     {
-        PlatformCoordinate platformCoordinate = new PlatformCoordinate();
-        platformCoordinate.X1 = x1;
-        platformCoordinate.X2 = x2;
-        platformCoordinate.Y = y;
-        return platformCoordinate;
-    }
-
-    public List<int> GenerateEnemies(int placesCount, float p, int mapLength)
-    {
-        List<int> enemySpotsCoordinates = new List<int>();
-
+        int mapLength = floor.Length;
         List<int> enemySpotNumbers = DistributeSpots(placesCount, (int)(placesCount * p));
         int spotLength = mapLength / placesCount;
 
@@ -144,10 +161,8 @@ public class MapGenerator
             int minX = i * spotLength;
             int maxX = minX + spotLength;
             int x = Random.Range(minX, maxX);
-            enemySpotsCoordinates.Add(x);
+            floor.AddEnemy(TypeEnemy.Melee, floor.GetIndexPlatform(x), x);
         }
-
-        return enemySpotsCoordinates;
     }
 
     private List<int> DistributeSpots(int placesCount, int spotsCount)

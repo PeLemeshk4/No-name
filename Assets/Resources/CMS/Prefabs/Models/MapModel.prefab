@@ -44,12 +44,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1729a46f79086449a991b5512530e60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CMS::CMSEntityPfb
-  idCMS: 
+  idCMS: CMS/Prefabs/Models/MapModel
   Components:
   - rid: 9155168327873855571
+  - rid: 6796072783102607434
   references:
     version: 2
     RefIds:
+    - rid: 6796072783102607434
+      type: {class: TagMapEnemies, ns: , asm: Assembly-CSharp}
+      data:
+        PlacesCount: 18
+        P: 0.7
     - rid: 9155168327873855571
       type: {class: TagMapPlatforms, ns: , asm: Assembly-CSharp}
       data:
