@@ -11,7 +11,7 @@ public class MapFloor
 {
     private int length = 0;
     private int maxY = 0;
-    private int platformCount = 0;
+    private int platformsCount = 0;
     private List<PlatformCoordinate> platforms;
     private List<List<(TypeEnemy, int)>> enemies;
     private HashSet<int> enemiesNumbers;
@@ -19,7 +19,7 @@ public class MapFloor
 
     public int Length { get { return length; } }
     public int MaxY { get { return maxY;  } }
-    public int PlatformCount { get { return platformCount; } }
+    public int PlatformsCount { get { return platformsCount; } }
     public List<PlatformCoordinate> Platforms { get { return platforms; } }
     public List<List<(TypeEnemy, int)>> Enemies { get { return enemies; } }
     public HashSet<int> EnemiesNumbers {  get { return enemiesNumbers; } }
@@ -36,7 +36,7 @@ public class MapFloor
 
     public int GetIndexPlatform(int coordinate)
     {
-        for (int i = 0; i < platformCount; i++)
+        for (int i = 0; i < platformsCount; i++)
         {
             if (coordinate >= platforms[i].X1 && coordinate < platforms[i].X2)
             {
@@ -57,16 +57,16 @@ public class MapFloor
         platforms.Add(coordinate);
         enemies.Add(new List<(TypeEnemy, int)>());
         puddles.Add(new List<Vector2Int>());
-        platformCount++;
+        platformsCount++;
         length = coordinate.X2;
         return true;
     }
 
     public bool AddEnemy(TypeEnemy type, int platformNumber, int coordinate)
     {
-        if (platformNumber >= platformCount) return false;
+        if (platformNumber >= platformsCount) return false;
         if (coordinate < platforms[platformNumber].X1
-            && coordinate > platforms[platformNumber].X2) return false;
+            || coordinate > platforms[platformNumber].X2) return false;
 
         enemies[platformNumber].Add((type, coordinate));
         enemiesNumbers.Add(platformNumber);
@@ -104,15 +104,15 @@ public class MapGenerator
     public void GeneratePlatforms(MapFloor floor, int count, int minLength, int maxLength, int totalLength)
     {
         List<PlatformCoordinate> platforms = floor.Platforms;
-        int platformCount = floor.PlatformCount;
+        int platformsCount = floor.PlatformsCount;
 
         int remainCount = count;
         int remainLength = totalLength;
 
-        for (int i = platformCount - 1; i < platformCount + count; i++)
+        for (int i = platformsCount - 1; i < platformsCount + count; i++)
         {
             (int, int) minMaxLength = GetMinMaxLength(minLength, maxLength, remainCount, remainLength);
-            int platformLength = Random.Range(minMaxLength.Item1, minMaxLength.Item2);
+            int platformLength = Random.Range(minMaxLength.Item1, minMaxLength.Item2 + 1);
             int y = Random.Range(0, floor.MaxY);
             floor.AddPlatform(platformLength, y);
             remainCount--;
@@ -153,21 +153,19 @@ public class MapGenerator
     public void GenerateEnemies(MapFloor floor, int placesCount, float p)
     {
         int mapLength = floor.Length;
-        List<int> enemySpotNumbers = DistributeSpots(placesCount, (int)(placesCount * p));
-        int spotLength = mapLength / placesCount;
+        List<int> enemySpotNumbers = DistributeSpots(floor, (int)(placesCount * p));
 
         foreach (int i in enemySpotNumbers)
         {
-            int minX = i * spotLength;
-            int maxX = minX + spotLength;
-            int x = Random.Range(minX, maxX);
-            floor.AddEnemy(TypeEnemy.Melee, floor.GetIndexPlatform(x), x);
+            PlatformCoordinate coordinate = floor.Platforms[i];
+            int x = Random.Range(coordinate.X1, coordinate.X2);
+            floor.AddEnemy(TypeEnemy.Melee, i, x);
         }
     }
 
     private List<int> DistributeSpots(int placesCount, int spotsCount)
     {
-        List<int> enemySpotsNumbers = new List<int>();
+        List<int> spotsNumbers = new List<int>();
 
         LinkedList<int> placesNumbers = new LinkedList<int>();
         for (int i = 0; i < placesCount; i++)
@@ -187,7 +185,7 @@ public class MapGenerator
             {
                 nodeWillDelete = nodeWillDelete.Next;
             }
-            enemySpotsNumbers.Add(nodeWillDelete.Value);
+            spotsNumbers.Add(nodeWillDelete.Value);
 
             LinkedListNode<int> previosNode = nodeWillDelete.Previous;
             LinkedListNode<int> nextNode = nodeWillDelete.Next;
@@ -214,6 +212,84 @@ public class MapGenerator
             remainPlacesCount -= deletedPlaces;
         }
 
-        return enemySpotsNumbers;
+        return spotsNumbers;
+    }
+
+    private List<int> DistributeSpots(MapFloor floor, int spotsCount)
+    {
+        List<int> spotsNumbers = new List<int>();
+
+        LinkedList<(int, int)> places = new LinkedList<(int, int)>();
+        for (int i = 0; i < floor.PlatformsCount; i++)
+        {
+            int length = floor.Platforms[i].X2 - floor.Platforms[i].X1;
+            places.AddLast((i, length));
+        }
+
+        int d = floor.Length / spotsCount;
+
+        int remainPlacesCount = floor.PlatformsCount;
+        for (int i = 0; i < spotsCount; i++)
+        {
+            int placeNumber = Random.Range(0, remainPlacesCount);
+
+            LinkedListNode<(int, int)> chosenPlace = places.First;
+            for (int j = 0; j < placeNumber; j++)
+            {
+                chosenPlace = chosenPlace.Next;
+            }
+            spotsNumbers.Add(chosenPlace.Value.Item1);
+
+            int remainD = d - chosenPlace.Value.Item2;
+            if (remainD >= 0)
+            {
+                LinkedListNode<(int, int)> previosPlace = chosenPlace.Previous;
+                if (previosPlace != null)
+                {
+                    int previosRemainD = remainD / 2 - previosPlace.Value.Item2;
+                    while (previosRemainD >= 0)
+                    {
+                        LinkedListNode<(int, int)> newPreviosPlace = previosPlace.Previous;
+                        places.Remove(previosPlace);
+                        remainPlacesCount--;
+                        if (newPreviosPlace == null) break;
+                        previosPlace = newPreviosPlace;
+                        previosRemainD = previosRemainD - previosPlace.Value.Item2;
+                    }
+                    if (previosRemainD < 0)
+                    {
+                        previosPlace.Value = (previosPlace.Value.Item1, Mathf.Abs(previosRemainD));
+                    }
+                }
+
+                LinkedListNode<(int, int)> nextPlace = chosenPlace.Next;
+                if (nextPlace != null)
+                {
+                    int nextRemainD = remainD / 2 - nextPlace.Value.Item2;
+                    while (nextRemainD >= 0)
+                    {
+                        LinkedListNode<(int, int)> newNextPlace = nextPlace.Next;
+                        places.Remove(nextPlace);
+                        remainPlacesCount--;
+                        if (newNextPlace == null) break; 
+                        nextPlace = newNextPlace;
+                        nextRemainD = nextRemainD - nextPlace.Value.Item2;
+                    }
+                    if (nextRemainD < 0)
+                    {
+                        nextPlace.Value = (nextPlace.Value.Item1, Mathf.Abs(nextRemainD));
+                    }
+                }
+
+                places.Remove(chosenPlace);
+                remainPlacesCount--;
+            }
+            else
+            {
+                chosenPlace.Value = (chosenPlace.Value.Item1, Mathf.Abs(remainD));
+            }
+        }
+
+        return spotsNumbers;
     }
 }

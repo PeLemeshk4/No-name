@@ -60,6 +60,6 @@ MonoBehaviour:
       type: {class: TagMapPlatforms, ns: , asm: Assembly-CSharp}
       data:
         Count: 30
-        MinLength: 10
-        MaxLength: 20
+        MinLength: 15
+        MaxLength: 25
         TotalLength: 450
