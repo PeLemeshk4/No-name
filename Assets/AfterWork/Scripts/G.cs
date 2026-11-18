@@ -74,7 +74,7 @@ public class G : MonoBehaviour
 
         mapGenerator = new MapGenerator(playerModel, cam, 0.7f);
         lowerFloor = mapGenerator.GenerateMapFloor(mapModel);
-        upperFloor = mapGenerator.GenerateMapFloor(mapModel, enemies:false);
+        upperFloor = mapGenerator.GenerateMapFloor(mapModel, puddles:false, enemies:false);
 
         mapBuilder.BuildFloor(lowerFloor, true, enemyPfb);
         mapBuilder.BuildFloor(upperFloor, false, enemyPfb);
@@ -89,7 +89,9 @@ public class G : MonoBehaviour
             { States.Run, 5 },
             { States.Attack, 7 },
             { States.Jump, 5 },
-            { States.Fall, 5 }
+            { States.Fall, 5 },
+            { States.Stealth, 0 },
+            { States.StealthRun, 0 }
         };
     }
 }

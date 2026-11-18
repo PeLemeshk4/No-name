@@ -13,17 +13,19 @@ public class MapFloor
     private int maxY = 0;
     private int platformsCount = 0;
     private List<PlatformCoordinate> platforms;
+    private List<List<Vector2Int>> puddles;
+    private HashSet<int> puddlesNumbers;
     private List<List<(TypeEnemy, int)>> enemies;
     private HashSet<int> enemiesNumbers;
-    private List<List<Vector2Int>> puddles;
 
     public int Length { get { return length; } }
     public int MaxY { get { return maxY;  } }
     public int PlatformsCount { get { return platformsCount; } }
     public List<PlatformCoordinate> Platforms { get { return platforms; } }
+    public List<List<Vector2Int>> Puddles { get { return puddles; } }
+    public HashSet<int> PuddlesNumbers { get { return puddlesNumbers; } }
     public List<List<(TypeEnemy, int)>> Enemies { get { return enemies; } }
     public HashSet<int> EnemiesNumbers {  get { return enemiesNumbers; } }
-    public List<List<Vector2Int>> Puddles { get { return puddles; } }
 
     public MapFloor(int maxY)
     {
@@ -31,6 +33,7 @@ public class MapFloor
         enemies = new List<List<(TypeEnemy, int)>>();
         enemiesNumbers = new HashSet<int>();
         puddles = new List<List<Vector2Int>>();
+        puddlesNumbers = new HashSet<int>();
         this.maxY = maxY;
     }
 
@@ -62,7 +65,17 @@ public class MapFloor
         return true;
     }
 
-    public bool AddEnemy(TypeEnemy type, int platformNumber, int coordinate)
+    public bool AddPuddle(int platformNumber, int startX, int length)
+    {
+        if (startX < platforms[platformNumber].X1) return false;
+        if (startX + length > platforms[platformNumber].X2) return false;
+
+        puddles[platformNumber].Add(new Vector2Int(startX, startX + length));
+        puddlesNumbers.Add(platformNumber);
+        return true;
+    }
+
+    public bool AddEnemy(int platformNumber, TypeEnemy type, int coordinate)
     {
         if (platformNumber >= platformsCount) return false;
         if (coordinate < platforms[platformNumber].X1
@@ -83,7 +96,7 @@ public class MapGenerator
         maxOffset = (int)(cam.orthographicSize * maxPercentOffset);
     }
 
-    public MapFloor GenerateMapFloor(CMSEntity mapModel, bool platforms = true, bool enemies = true)
+    public MapFloor GenerateMapFloor(CMSEntity mapModel, bool platforms = true, bool puddles = true, bool enemies = true)
     {
         MapFloor floor = new MapFloor(maxOffset);
 
@@ -91,6 +104,11 @@ public class MapGenerator
         {
             TagMapPlatforms tagMP = mapModel.Get<TagMapPlatforms>();
             GeneratePlatforms(floor, tagMP.Count, tagMP.MinLength, tagMP.MaxLength, tagMP.TotalLength);
+        }
+        if (puddles)
+        {
+            TagMapPuddles tagMPud = mapModel.Get<TagMapPuddles>();
+            GeneratePuddles(floor, tagMPud.PlacesCount, tagMPud.P);
         }
         if (enemies)
         {
@@ -150,73 +168,40 @@ public class MapGenerator
         return (newMinLength, newMaxLength);
     }
 
+    public void GeneratePuddles(MapFloor floor, int placesCount, float p)
+    {
+        int mapLength = floor.Length;
+        int spotsCount = (int)(placesCount * p);
+        if (spotsCount == 0) return;
+        List<int> puddleSpotNumbers = DistributeSpots(floor, spotsCount);
+
+        foreach (int i in puddleSpotNumbers)
+        {
+            PlatformCoordinate coordinate = floor.Platforms[i];
+            int x = Random.Range(coordinate.X1, coordinate.X2 - 2);
+            floor.AddPuddle(i, x, 3);
+        }
+    }
+
     public void GenerateEnemies(MapFloor floor, int placesCount, float p)
     {
         int mapLength = floor.Length;
-        List<int> enemySpotNumbers = DistributeSpots(floor, (int)(placesCount * p));
+        int spotsCount = (int)(placesCount * p);
+        if (spotsCount == 0) return;
+        List<int> enemySpotNumbers = DistributeSpots(floor, spotsCount);
 
         foreach (int i in enemySpotNumbers)
         {
             PlatformCoordinate coordinate = floor.Platforms[i];
             int x = Random.Range(coordinate.X1, coordinate.X2);
-            floor.AddEnemy(TypeEnemy.Melee, i, x);
+            floor.AddEnemy(i, TypeEnemy.Melee, x);
         }
-    }
-
-    private List<int> DistributeSpots(int placesCount, int spotsCount)
-    {
-        List<int> spotsNumbers = new List<int>();
-
-        LinkedList<int> placesNumbers = new LinkedList<int>();
-        for (int i = 0; i < placesCount; i++)
-        {
-            placesNumbers.AddLast(i);
-        }
-
-        int d = (placesCount - spotsCount) / (2 * spotsCount - 2);
-
-        int remainPlacesCount = placesCount;
-        for (int i = 0; i < spotsCount; i++)
-        {
-            int spotNumber = Random.Range(0, remainPlacesCount);
-
-            LinkedListNode<int> nodeWillDelete = placesNumbers.First;
-            for (int j = 0; j < spotNumber; j++)
-            {
-                nodeWillDelete = nodeWillDelete.Next;
-            }
-            spotsNumbers.Add(nodeWillDelete.Value);
-
-            LinkedListNode<int> previosNode = nodeWillDelete.Previous;
-            LinkedListNode<int> nextNode = nodeWillDelete.Next;
-            placesNumbers.Remove(nodeWillDelete);
-            int deletedPlaces = 1;
-            for (int j = 0; j < d; j++)
-            {
-                if (previosNode != null)
-                {
-                    nodeWillDelete = previosNode;
-                    previosNode = previosNode.Previous;
-                    placesNumbers.Remove(nodeWillDelete);
-                    deletedPlaces++;
-                }
-
-                if (nextNode != null)
-                {
-                    nodeWillDelete = nextNode;
-                    nextNode = nextNode.Next;
-                    placesNumbers.Remove(nodeWillDelete);
-                    deletedPlaces++;
-                }
-            }
-            remainPlacesCount -= deletedPlaces;
-        }
-
-        return spotsNumbers;
     }
 
     private List<int> DistributeSpots(MapFloor floor, int spotsCount)
     {
+        if (spotsCount == 0) return null;
+
         List<int> spotsNumbers = new List<int>();
 
         LinkedList<(int, int)> places = new LinkedList<(int, int)>();

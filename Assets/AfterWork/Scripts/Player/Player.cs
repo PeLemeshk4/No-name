@@ -1,6 +1,7 @@
 using NUnit.Framework.Constraints;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -45,6 +46,7 @@ public class Player : MonoBehaviour
     private bool willAttack = false;
     private bool wantAttack = false;
     private Vector2 attackDirection = Vector2.zero;
+    private bool wantStealth = false;
 
     public float AimingTime
     {
@@ -67,6 +69,8 @@ public class Player : MonoBehaviour
         playerInput.actions["Dash"].canceled += OnDashCanceled;
         playerInput.actions["Attack"].canceled += OnAttackCanceled;
         playerInput.actions["Attack"].started += OnAttackStarted;
+        playerInput.actions["Stealth"].started += OnStealthStarted;
+        playerInput.actions["Stealth"].canceled += OnStealthCanceled;
 
         moveAbility = GetComponent<MoveAbility>();
         jumpAbility = GetComponent<JumpAbility>();
@@ -181,7 +185,12 @@ public class Player : MonoBehaviour
         // Определение состояния игрока
         if (!jumpAbility.NotOnGround)
         {
-            if (Mathf.Abs(rb.linearVelocityX) > 0.1) sM.SetState(States.Run);
+            if (Mathf.Abs(rb.linearVelocityX) > 0.1)
+            {
+                if (wantStealth) sM.SetState(States.StealthRun);
+                else sM.SetState(States.Run);
+            }
+            else if (wantStealth) sM.SetState(States.Stealth);
             else sM.SetState(States.Idle);
         }
         else if (rb.linearVelocityY > 0) sM.SetState(States.Jump);
@@ -287,6 +296,16 @@ public class Player : MonoBehaviour
 
         look.SetActive(true);
         circleTimer.StartTimer(AimingTime);
+    }
+
+    private void OnStealthStarted(InputAction.CallbackContext context)
+    {
+        wantStealth = true;
+    }
+
+    private void OnStealthCanceled(InputAction.CallbackContext context)
+    {
+        wantStealth = false;
     }
 
     private void TimerEnd(object o, EventArgs e)

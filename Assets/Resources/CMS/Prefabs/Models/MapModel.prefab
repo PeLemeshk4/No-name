@@ -47,6 +47,7 @@ MonoBehaviour:
   idCMS: CMS/Prefabs/Models/MapModel
   Components:
   - rid: 9155168327873855571
+  - rid: 6796072849793089610
   - rid: 6796072783102607434
   references:
     version: 2
@@ -56,6 +57,12 @@ MonoBehaviour:
       data:
         PlacesCount: 18
         P: 0.7
+    - rid: 6796072849793089610
+      type: {class: TagMapPuddles, ns: , asm: Assembly-CSharp}
+      data:
+        PlacesCount: 10
+        P: 0.7
+        MinMaxLength: {x: 3, y: 3}
     - rid: 9155168327873855571
       type: {class: TagMapPlatforms, ns: , asm: Assembly-CSharp}
       data:

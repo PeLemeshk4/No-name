@@ -2025,6 +2025,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MapBuilder
   cam: {fileID: 1637662171}
   platformTile: {fileID: 11400000, guid: ee385c6ed6ded5a4aa5b38aa32fe21af, type: 2}
+  puddleTile: {fileID: 11400000, guid: bce28760535050849afb891715fde82f, type: 2}
   lowerPlatform: {fileID: 389547661}
   upperPlatform: {fileID: 987799332}
 --- !u!1 &1279540626

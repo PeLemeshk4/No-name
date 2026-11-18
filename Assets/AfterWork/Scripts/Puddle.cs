@@ -18,7 +18,6 @@ public class Puddle : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log(1);
         if (collision.gameObject.TryGetComponent<EffectHandler>(out EffectHandler eH))
         {
 

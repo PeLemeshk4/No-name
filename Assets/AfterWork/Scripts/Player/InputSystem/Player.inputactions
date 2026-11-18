@@ -25,7 +25,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Slowing",
+                    "name": "Stealth",
                     "type": "Button",
                     "id": "3dfe376c-945d-4faf-8db8-6189bfa9309f",
                     "expectedControlType": "",
@@ -109,11 +109,11 @@
                 {
                     "name": "",
                     "id": "27a40d36-3e0a-490b-bb32-5124a2553ccc",
-                    "path": "<Keyboard>/space",
+                    "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Slowing",
+                    "action": "Stealth",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

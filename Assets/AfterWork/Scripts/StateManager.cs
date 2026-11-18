@@ -9,6 +9,8 @@ public enum States
     Fall,
     Dash,
     Attack,
+    Stealth,
+    StealthRun,
     Dead
 }
 
