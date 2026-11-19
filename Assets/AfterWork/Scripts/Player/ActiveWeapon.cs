@@ -27,7 +27,7 @@ public class ActiveWeapon : MonoBehaviour
     }
     public void Init(CMSEntity weaponModel)
     {
-        GameObject weaponObject = Factory.Create(Resources.Load<GameObject>("CMS/Prefabs/GameObjects/Weapon"), weaponModel);
+        weaponObject = Factory.Create(Resources.Load<GameObject>("CMS/Prefabs/GameObjects/Weapon"), weaponModel);
         weapon = weaponObject.GetComponent<Weapon>();
         weaponObject.transform.parent = transform;
         weaponObject.transform.localPosition = Vector3.zero;

@@ -28,6 +28,9 @@ public class HealthController : Controller
         if (value <= 0)
         {
             HealthIsNull?.Invoke(this, new EventArgs());
+
+            // пока так
+            GameObject.Destroy(gameObject);
         }
         return true;
     }

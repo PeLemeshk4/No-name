@@ -50,12 +50,14 @@ public class MapBuilder : MonoBehaviour
         enabled = true;
     }
 
-    public void BuildFloor(MapFloor floor, bool isBottom, GameObject enemyPfb)
+    public List<GameObject> BuildFloor(MapFloor floor, bool isBottom, GameObject enemyPfb, CMSEntity enemyModel)
     {
         Tilemap tileMap = isBottom ? lowerPlatform : upperPlatform;
         BuildPlatforms(floor, tileMap);
-        BuildEnemies(floor, tileMap, enemyPfb);
+        List<GameObject> enemies = BuildEnemies(floor, tileMap, enemyPfb, enemyModel);
         BuildPuddles(floor, tileMap, puddleTile);
+
+        return enemies;
     }
 
     public void BuildPlatforms(MapFloor floor, Tilemap tileMap)
@@ -95,16 +97,19 @@ public class MapBuilder : MonoBehaviour
         
     }
 
-    public void BuildEnemies(MapFloor floor, Tilemap tileMap, GameObject enemyPfb)
+    public List<GameObject> BuildEnemies(MapFloor floor, Tilemap tileMap, GameObject enemyPfb, CMSEntity enemyModel)
     {
+        List<GameObject> enemies = new List<GameObject>();
         foreach (int i in floor.EnemiesNumbers)
         {
             foreach ((TypeEnemy, int) enemyData in floor.Enemies[i])
             {
-                GameObject enemyObject = Instantiate(enemyPfb);
+                GameObject enemyObject = Factory.Create(enemyPfb, enemyModel);
                 enemyObject.transform.parent = tileMap.transform;
                 enemyObject.transform.localPosition = new Vector3(enemyData.Item2, floor.Platforms[i].Y + 2, 0);
+                enemies.Add(enemyObject);
             }
         }
+        return enemies;
     }
 }

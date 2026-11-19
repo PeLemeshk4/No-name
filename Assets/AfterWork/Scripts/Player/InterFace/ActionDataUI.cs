@@ -33,7 +33,9 @@ public class ActionDataUI : MonoBehaviour
         textMeshPro.text = "Total Time: " + actionTracker.TotalTime.ToString() + "\n"
             + "Dash Count: " + actionTracker.DashCount.ToString() + "\n"
             + "Attack Count: " + actionTracker.AttackCount.ToString() + "\n"
-            + "Idle Time: " + actionTracker.IdleTime.ToString();
+            + "Idle Time: " + actionTracker.IdleTime.ToString() + "\n"
+            + "Stealth Time: " + actionTracker.StealthTime.ToString() + "\n"
+            + "killed Enemy: " + actionTracker.KilledEnemy.ToString();
 
     }
 }

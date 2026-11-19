@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ public class G : MonoBehaviour
     private CMSEntity mapModel;
 
     private GameObject playerPfb;
-    [SerializeField] private GameObject enemyPfb;
+    private GameObject enemyPfb;
 
     private MapGenerator mapGenerator;
     private MapBuilder mapBuilder;
@@ -35,8 +36,8 @@ public class G : MonoBehaviour
 
         playerPfb = Resources.Load<GameObject>("CMS/Prefabs/GameObjects/Player");
         playerModel = CMS.Get<CMSEntity>("CMS/Prefabs/Models/Entities/PlayerModel");
-        //enemyPfb = Resources.Load<GameObject>("CMS/Prefabs/GameObjects/Enemy");
-        enemyModel = CMS.Get<CMSEntity>("CMS/Prefabs/Models/Entities/EnemyModel");
+        enemyPfb = Resources.Load<GameObject>("CMS/Prefabs/GameObjects/EnemyTest");
+        enemyModel = CMS.Get<CMSEntity>("CMS/Prefabs/Models/Entities/EnemyTestModel");
         mapModel = CMS.Get<CMSEntity>("CMS/Prefabs/Models/MapModel");
 
         cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
@@ -76,11 +77,19 @@ public class G : MonoBehaviour
         lowerFloor = mapGenerator.GenerateMapFloor(mapModel);
         upperFloor = mapGenerator.GenerateMapFloor(mapModel, puddles:false, enemies:false);
 
-        mapBuilder.BuildFloor(lowerFloor, true, enemyPfb);
-        mapBuilder.BuildFloor(upperFloor, false, enemyPfb);
+        List<GameObject> enemies = mapBuilder.BuildFloor(lowerFloor, true, enemyPfb, enemyModel);
+        mapBuilder.BuildFloor(upperFloor, false, enemyPfb, enemyModel);
+
+        foreach (GameObject enemy in enemies)
+        {
+            if (enemy.TryGetComponent<HealthController>(out HealthController hC))
+            {
+                hC.HealthIsNull += playerActionTracker.EnemyDead;
+            }
+        }
     }
 
-    // Добавление тэга (словарь не поддерживается в этом CMS) 
+    // Добавление тэга (словарь не поддерживается в инспекторе этого CMS) 
     private void AddStatesAndVolumes()
     {
         playerModel.Get<TagStatesAndVolumes>().StatesAndVolumes = new Dictionary<States, float>

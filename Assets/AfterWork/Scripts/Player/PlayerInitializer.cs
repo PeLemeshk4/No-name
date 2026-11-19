@@ -53,7 +53,7 @@ public class PlayerInitializer : Initializer
         activeWeapon.Init(CMS.Get<CMSEntity>(model.Get<TagWeapon>().Weapon.GetId()));
         AttackAbility = new AttackAbility();
         healthController.Init(model.Get<TagHealth>());
-        attackHandler.Init(look.GetComponent<LookAbility>(), healthController); //?
+        attackHandler.Init(healthController);
         effectHandler.Init();
         circleTimer.Init();
 
